@@ -1,7 +1,7 @@
 {
   "name": "butter-bot",
   "version": "0.1.0",
-  "description": "I'm a robot. What is my purpose?",
+  "description": "I'm an opdroid seeking purpose.",
   "main": "src/index.js",
   "scripts": {
     "start": "node ."
@@ -18,9 +18,10 @@
     "automaton",
     "twitch",
     "discord",
-    "purpose"
+    "purpose",
+    "opdroid"
   ],
-  "author": "Roy de Jong <roy@softwarepunt.nl>",
+  "author": "Roy de Jong <roy@opdroid.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/roydejong/butter-bot/issues"
@@ -28,6 +29,7 @@
   "homepage": "https://github.com/roydejong/butter-bot#readme",
   "dependencies": {
     "discord.js": "^11.3.2",
+    "lowdb": "^1.0.0",
     "minimist": "^1.2.0",
     "tmi.js": "^1.2.1"
   }

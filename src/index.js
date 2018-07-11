@@ -1,1 +1,3 @@
-console.log("Hello world.\r\n");
+const Butterbot = require('./Core/Butterbot.js');
+
+Butterbot.start();
