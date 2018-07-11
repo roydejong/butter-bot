@@ -7,7 +7,7 @@
 <p align="center">
  <a href="https://travis-ci.org/roydejong/butter-bot"><img src="https://img.shields.io/travis/roydejong/butter-bot.svg" alt="Build Status"></a>
  <a href="https://www.npmjs.com/package/butter-bot"><img src="https://img.shields.io/npm/v/butter-bot.svg" alt="Package on npm"></a>
- <a href="https://david-dm.org/roydejong/butter-bot"><img src="https://img.shields.io/travis/roydejong/butter-bot.svg" alt="Dependencies"></a>
+ <a href="https://david-dm.org/roydejong/butter-bot"><img src="https://img.shields.io/david/roydejong/butter-bot.svg" alt="Dependencies"></a>
 </p>
 
 ## About Butter Bot
