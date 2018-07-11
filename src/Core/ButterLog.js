@@ -1,3 +1,4 @@
+const fs = require('fs');
 const winston = require('winston');
 
 /**
@@ -8,6 +9,12 @@ class ButterLog {
      * Initializes the .
      */
     static init(level) {
+        try {
+            if (!fs.existsSync('./logs')) {
+                fs.mkdirSync('./logs');
+            }
+        } catch (e) { }
+
         this.logger = winston.createLogger({
             level: "info",
             format: winston.format.combine(
@@ -30,6 +37,10 @@ class ButterLog {
                 winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
             )
         }));
+
+        if (!fs.existsSync('./logs')) {
+            this.logger.warn('Could not create `logs` directory. Logs may not be written to disk.');
+        }
     }
 
     /**
