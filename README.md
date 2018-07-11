@@ -1,4 +1,4 @@
 <p align="center">
   <h1>Butter Bot</h1>
-  <img src="etc/Butter_Boto.sm.png" alt="Butter Bot">
+  <img src="https://github.com/roydejong/butter-bot/raw/master/etc/Butter_Robot.sm.png" alt="Butter Bot">
 </p>
