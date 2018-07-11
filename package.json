@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/roydejong/butter-bot#readme",
   "dependencies": {
+    "discord.js": "^11.3.2",
     "tmi.js": "^1.2.1"
   }
 }
