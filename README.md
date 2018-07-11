@@ -9,6 +9,8 @@
 
 ## About Butter Bot
 
+**⚠️ This is pre-release software in active development. It is not yet in a usable state.**
+
 Butter Bot is a general purpose bot that can perform a variety of tasks asynchronously. Give it purpose and put it to work!
 
 ## Getting started
