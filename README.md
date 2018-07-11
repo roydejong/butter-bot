@@ -1,3 +1,7 @@
-# butter-bot
+<p align="center">
 
-A work in progress, you could say.
+<h1>Butter Bot</h1>
+
+![Image of Butter Bot](etc/Butter_Robot.sm.png)
+    
+</p>
