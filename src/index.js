@@ -1,3 +1,1 @@
-const Butterbot = require('./Core/Butterbot.js');
-
-Butterbot.start();
+require('./Core/ButterBot').start();

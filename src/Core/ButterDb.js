@@ -23,6 +23,13 @@ class ButterDb {
     }
 
     /**
+     * Gets the filename used.
+     */
+    static getFilename() {
+        return this.adapter.source;
+    }
+
+    /**
      * Initializes the database with a default schema.
      *
      * @private
