@@ -1,0 +1,29 @@
+{
+  "name": "butter-bot",
+  "version": "0.1.0",
+  "description": "I'm a robot. What is my purpose?",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roydejong/butter-bot.git"
+  },
+  "keywords": [
+    "robot",
+    "bot",
+    "butter",
+    "droid",
+    "automaton",
+    "twitch",
+    "discord",
+    "purpose"
+  ],
+  "author": "Roy de Jong <roy@softwarepunt.nl>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/roydejong/butter-bot/issues"
+  },
+  "homepage": "https://github.com/roydejong/butter-bot#readme"
+}
