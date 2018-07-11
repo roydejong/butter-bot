@@ -9,6 +9,22 @@
 
 ## About Butter Bot
 
-Butter Bot is a robot that seeks purpose.
+Butter Bot is a general purpose bot that can perform a variety of tasks asynchronously. Give it purpose and put it to work!
 
-It is also a work in progress. 
+## Getting started
+
+The Butter Bot [package](https://www.npmjs.com/package/butter-bot) is available via npm as `butter-bot`. The easiest way to get started is to install it on your system globally:
+
+    npm i --global butter-bot  
+
+Once installed, the `butterbot` executable will be available on your system. To start the bot, simply run:
+
+    butterbot
+
+If everything is working correctly, the bot will continue running indefinitely until it is stopped manually. You can trigger a safe shutdown by sending the interrupt signal (<kbd>CTRL</kbd> + <kbd>C</kbd>).
+
+Before the Butter Bot does anything useful, you need to give it purpose. You will need to define a task list, or connect it to a task server like [Opdroid.com](https://www.opdroid.com).
+
+### Command line options
+
+For an overview of all command line and usage options, use `butterbot --help`. You can also view the raw [help text](etc/help+usage.txt).
