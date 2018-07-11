@@ -1,0 +1,16 @@
+Usage: butterbot [options]
+
+Help and documentation:
+
+    -h, --help          Show this usage information.
+    -v, --version       Show version information.
+
+Normal usage options:
+
+    -q, --quiet         Suppress non-essential output; only output/log warnings and errors.
+    -d, --db <path>     Define a custom database file to use, relative to working directory.
+                        Defaults to `data/butterdb.json` if unspecified.
+
+Additional support and info at:
+
+    https://github.com/roydejong/butter-bot

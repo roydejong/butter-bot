@@ -1,3 +1,6 @@
+const SelfPackage = require('../../package');
+const fs = require('fs');
+
 /**
  * Main utility class for Butterbot runtime.
  */
@@ -8,19 +11,18 @@ class ButterBot {
      */
     static start() {
         // Process command line arguments
-        this._processArgv();
+        if (!this._processArgv()) {
+            return false;
+        }
 
         // Version header
-        const SelfPackage = require('../../package');
-
         if (!this.quietMode) {
-            console.log(`Butter Bot [Version ${SelfPackage.version}]`);
-            console.log(`Copyright (c) 2018 Roy de Jong\r\n`);
+            this._logVersionHeader(true);
         }
 
         // Init logging / console output
         const ButterLogUtil = require('./ButterLog').util;
-        ButterLogUtil.init(this.quietMode ? "error" : "info");
+        ButterLogUtil.init(this.quietMode ? "warn" : "info");
 
         const ButterLog = ButterLogUtil.logger;
 
@@ -41,9 +43,23 @@ class ButterBot {
      * Processes command line arguments and configures Butterbot accordingly.
      *
      * @private
+     * @return {boolean} Returns true if execution should continue; false if execution should halt.
      */
     static _processArgv() {
         let argv = require('minimist')(process.argv.slice(2));
+
+        // Help / usage text
+        if (argv["help"] || argv.h) {
+            this._logVersionHeader(true);
+            this._logHelpText();
+            return false;
+        }
+
+        // Version text
+        if (argv["version"] || argv.v) {
+            this._logVersionHeader();
+            return false;
+        }
 
         /**
          * Override path to the database file (via `--db` or `-d`).
@@ -60,6 +76,44 @@ class ButterBot {
          * @type {*|null}
          */
         this.quietMode = !!(argv["quiet"] || argv["silent"] || argv.q || false);
+
+        return true;
+    }
+
+    /**
+     * Writes the application help / usage text to stdout.
+     *
+     * @private
+     */
+    static _logHelpText() {
+        let raw = fs.readFileSync(__dirname + "/../../etc/help+usage.txt", "utf8");
+        console.log(raw);
+    }
+
+    /**
+     * Writes the application version / license header to stdout.
+     *
+     * @param {boolean} extraSpacing - If true, add extra newline after output.
+     * @private
+     */
+    static _logVersionHeader(extraSpacing) {
+        console.log(`Butter Bot [Version ${SelfPackage.version}] (https://opdroid.com)`);
+        console.log(`Copyright (c) 2018 Roy de Jong, MIT licensed`);
+
+        if (require('node-version-compare')(SelfPackage.version, '1.0') < 0) {
+            console.log("\r\n" +
+                " ╭──────────────────────────────────────────────────────╮\n" +
+                " │ This is pre-release software. Thank you for testing! │\n" +
+                " │ ---------------------------------------------------- │\n" +
+                " │ Report bugs and other feedback on GitHub:            │\n" +
+                " │ https://github.com/roydejong/butter-bot/issues       │\n" +
+                " ╰──────────────────────────────────────────────────────╯"
+            );
+        }
+
+        if (extraSpacing) {
+            console.log(" ");
+        }
     }
 }
 
