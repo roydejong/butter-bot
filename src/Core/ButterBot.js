@@ -28,7 +28,7 @@ class ButterBot {
         const ButterDb = require('./ButterDb');
         ButterDb.init(this.dbFilename);
 
-        ButterLog.info(`Using database ${ButterDb.getFilename()}`);
+        ButterLog.info(`Using database file ${ButterDb.getFilename()}`);
     }
 
     /**

@@ -8,23 +8,27 @@ class ButterLog {
      * Initializes the .
      */
     static init(level) {
-        this.format = winston.format.combine(
-            winston.format.colorize(),
-            winston.format.simple()
-        );
-
         this.logger = winston.createLogger({
             level: "info",
-            format: this.format,
+            format: winston.format.combine(
+                winston.format.timestamp(),
+                winston.format.align(),
+                winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+            ),
             transports: [
-                new winston.transports.File({ filename: 'butter-error.log', level: 'error' }),
-                new winston.transports.File({ filename: 'butter.log' })
+                new winston.transports.File({filename: 'logs/error.log', level: 'error'}),
+                new winston.transports.File({filename: 'logs/butter.log'})
             ]
         });
 
         this.logger.add(new winston.transports.Console({
             level: level || "info",
-            format: this.format
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.timestamp(),
+                winston.format.align(),
+                winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+            )
         }));
     }
 
