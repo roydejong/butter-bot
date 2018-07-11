@@ -26,7 +26,13 @@ class ButterBot {
 
         // Initialize database
         const ButterDb = require('./ButterDb');
-        ButterDb.init(this.dbFilename);
+
+        try {
+            ButterDb.init(this.dbFilename);
+        } catch (dbErr) {
+            ButterLog.error(`Could not open database file => ${dbErr.toString()}`);
+            return;
+        }
 
         ButterLog.info(`Using database file ${ButterDb.getFilename()}`);
     }

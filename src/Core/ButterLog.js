@@ -39,7 +39,7 @@ class ButterLog {
         }));
 
         if (!fs.existsSync('./logs')) {
-            this.logger.warn('Could not create `logs` directory. Logs may not be written to disk.');
+            this.logger.warn('Could not create `logs` directory. Log files may not be written to disk.');
         }
     }
 
