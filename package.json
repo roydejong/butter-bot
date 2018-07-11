@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/roydejong/butter-bot/issues"
   },
-  "homepage": "https://github.com/roydejong/butter-bot#readme"
+  "homepage": "https://github.com/roydejong/butter-bot#readme",
+  "dependencies": {
+    "tmi.js": "^1.2.1"
+  }
 }
