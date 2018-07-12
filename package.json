@@ -1,6 +1,6 @@
 {
   "name": "butter-bot",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "I'm an opdroid seeking purpose.",
   "main": "src/index.js",
   "scripts": {
