@@ -66,7 +66,11 @@ class ButterBot {
             let pkgToInstall = argv["install"] || argv.i || null;
 
             if (pkgToInstall) {
-                Bpm.install(pkgToInstall, true);
+                Bpm.install(pkgToInstall, true)
+                    .catch((err) => {
+                        // Install failed, but should already have been logged by installer or npm
+                    });
+
                 return false;
             }
         } else {
