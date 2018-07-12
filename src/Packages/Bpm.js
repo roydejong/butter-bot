@@ -1,6 +1,6 @@
-const SelfPackage = require('../../package');
 const Logger = require('../Core/ButterLog').util.getLogger();
 const npm = require('npm');
+const ButterDb = require('../Core/ButterDb');
 
 /**
  * BPM - Butterbot Package Manager
@@ -19,7 +19,7 @@ class Bpm {
         let isInstalled = this.isInstalled(pkgName);
 
         if (isInstalled && !force) {
-            Logger.warn(`Skip package installation: ${pkgName} is already installed.`);
+            Logger.warn(`SKIP: Not installing package ${pkgName} as it is already installed.`);
             return false;
         }
 
@@ -39,10 +39,6 @@ class Bpm {
                     return false;
                 }
 
-                npm.on("log", (msg) => {
-                    Logger.log(`npm\t\t${msg}`);
-                });
-
                 npm.commands.install([pkgName], (installErr, data) => {
                     if (installErr) {
                         Logger.error(`npm\t\t${installErr.toString()}`);
@@ -51,10 +47,55 @@ class Bpm {
                     }
 
                     Logger.info(`npm package was installed successfully.`);
+                    this.register(pkgName);
                     resolve(data);
                 });
             });
         });
+    }
+
+    /**
+     * Registers a package.
+     *
+     * @param {string} pkgName
+     */
+    static register(pkgName) {
+        let pkgNameTagIdx = pkgName.indexOf('@');
+        let pkgNameNoTag = pkgNameTagIdx >= 0 ? pkgName.substr(0, pkgNameTagIdx) : pkgName;
+
+        let pkgDataCurrent = ButterDb.db
+            .get('packages')
+            .find({ id: pkgNameNoTag })
+            .value();
+
+        if (!pkgDataCurrent) {
+            // Package is not yet in database, create stub
+            pkgDataCurrent = { id: pkgNameNoTag };
+
+            ButterDb.db
+                .get('packages')
+                .push(pkgDataCurrent)
+                .write();
+
+            Logger.info(`Registering as new package.`);
+        } else {
+            // Package already registerd
+            Logger.info(`Updating existing package registration.`);
+        }
+
+        // Perform update (either on new stub; or existing pacakge reg)
+        let registerValues = {
+            registered_at: new Date(),
+            lock_name: pkgName
+        };
+
+        ButterDb.db
+            .get('packages')
+            .find({ id: pkgNameNoTag })
+            .assign(registerValues)
+            .write();
+
+        Logger.info(`✅ OK. The package has been installed and registered to Butter Bot.`);
     }
 
     /**
