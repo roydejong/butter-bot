@@ -10,7 +10,7 @@ class PackageInitializer {
      * Initializes all packages.
      */
     static bootstrapPackages() {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             // Read all packages registered in the database file
             let packages = ButterDb.db
                 .get('packages')
@@ -18,7 +18,8 @@ class PackageInitializer {
 
             // If there are no packages, bail out now
             if (!packages || !packages.length) {
-                Logger.warn("[bpm] There are no packages registered.");
+                Logger.info("[bpm] No additional packages have been registered.");
+                resolve();
                 return;
             }
 
@@ -70,7 +71,7 @@ class PackageInitializer {
                         })
                         .catch((err) => {
                             // Install failed, step next
-                            countFailed--;
+                            countFailed++;
                             Logger.warn(`[bpm] Could not restore package ${pkg.id}: ${err}`);
                             fnNext();
                         });
