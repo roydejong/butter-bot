@@ -1,16 +1,16 @@
 Usage: butterbot [options]
 
-Help and documentation:
+    -h, --help              Show this usage information.
+    -v, --version           Show version information.
 
-    -h, --help          Show this usage information.
-    -v, --version       Show version information.
+    -i, --install <pkg>     Install, register or update a BB package / submodule.
+    -u, --uninstall <pkg>   Remove a BB package / submodule and unregister it.
+    -l, --list              Lists all registered BB packages.
 
-Normal usage options:
+    -q, --quiet             Suppress informational output and logging; reduce to warnings and errors.
+    -d, --db <path>         Define a custom database file to use, relative to working directory.
+                            Defaults to `data/butterdb.json` if unspecified.
 
-    -q, --quiet         Suppress non-essential output; only output/log warnings and errors.
-    -d, --db <path>     Define a custom database file to use, relative to working directory.
-                        Defaults to `data/butterdb.json` if unspecified.
-
-Additional support and info at:
+Source code, documentation and official issue tracker available via GitHub:
 
     https://github.com/roydejong/butter-bot

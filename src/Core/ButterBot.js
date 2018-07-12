@@ -1,5 +1,6 @@
 const SelfPackage = require('../../package');
 const fs = require('fs');
+const minimist = require('minimist');
 
 /**
  * Main utility class for Butterbot runtime.
@@ -10,8 +11,10 @@ class ButterBot {
      * Starts the application and begins the task queue.
      */
     static start() {
+        let argv = minimist(process.argv.slice(2));
+
         // Process command line arguments
-        if (!this._processArgv()) {
+        if (!this._processArgv(argv, false)) {
             return false;
         }
 
@@ -37,45 +40,67 @@ class ButterBot {
         }
 
         ButterLog.info(`Using database file ${ButterDb.getFilename()}`);
+
+        // Process command line arguments - level two (package maintenance etc)
+        if (!this._processArgv(argv, true)) {
+            return false;
+        }
+
+        ButterLog.info(`✅ Butter Bot has started successfully.`);
+        return true;
     }
 
     /**
      * Processes command line arguments and configures Butterbot accordingly.
      *
      * @private
+     * @param {object} argv - Parsed argv object.
+     * @param {boolean} levelTwo - If true, process level two arguments (package maintenance commands).
      * @return {boolean} Returns true if execution should continue; false if execution should halt.
      */
-    static _processArgv() {
-        let argv = require('minimist')(process.argv.slice(2));
+    static _processArgv(argv, levelTwo) {
+        if (levelTwo) {
+            // --- Package maintenance ---------------------------------------------------------------------------------
+            const Bpm = require('../Packages/Bpm');
 
-        // Help / usage text
-        if (argv["help"] || argv.h) {
-            this._logVersionHeader(true);
-            this._logHelpText();
-            return false;
+            let pkgToInstall = argv["install"] || argv.i || null;
+
+            if (pkgToInstall) {
+                Bpm.install(pkgToInstall);
+                return false;
+            }
+        } else {
+            // --- Help / usage text -----------------------------------------------------------------------------------
+
+            if (argv["help"] || argv.h) {
+                this._logVersionHeader(true);
+                this._logHelpText();
+                return false;
+            }
+
+            if (argv["version"] || argv.v) {
+                this._logVersionHeader();
+                return false;
+            }
+
+            // --- Normal usage ----------------------------------------------------------------------------------------
+
+            /**
+             * Override path to the database file (via `--db` or `-d`).
+             * If left blank, default database name is used (ButterDb.DEFAULT_FILENAME).
+             *
+             * @type {*|null}
+             */
+            this.dbFilename = argv["db"] || argv.d || null;
+
+            /**
+             * Set quiet mode (via `--quiet`, `--silent` or `-q`).
+             * Disables most logging except errors and warnings.
+             *
+             * @type {*|null}
+             */
+            this.quietMode = !!(argv["quiet"] || argv["silent"] || argv.q || false);
         }
-
-        // Version text
-        if (argv["version"] || argv.v) {
-            this._logVersionHeader();
-            return false;
-        }
-
-        /**
-         * Override path to the database file (via `--db` or `-d`).
-         * If left blank, default database name is used (ButterDb.DEFAULT_FILENAME).
-         *
-         * @type {*|null}
-         */
-        this.dbFilename = argv["db"] || argv.d || null;
-
-        /**
-         * Set quiet mode (via `--quiet`, `--silent` or `-q`).
-         * Disables most logging except errors and warnings.
-         *
-         * @type {*|null}
-         */
-        this.quietMode = !!(argv["quiet"] || argv["silent"] || argv.q || false);
 
         return true;
     }
@@ -97,7 +122,7 @@ class ButterBot {
      * @private
      */
     static _logVersionHeader(extraSpacing) {
-        console.log(`Butter Bot [Version ${SelfPackage.version}] (https://opdroid.com)`);
+        console.log(`🤖 Butter Bot [Version ${SelfPackage.version}] (https://butterbot.io)`);
         console.log(`Copyright (c) 2018 Roy de Jong, MIT licensed`);
 
         if (require('node-version-compare')(SelfPackage.version, '1.0') < 0) {

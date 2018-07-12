@@ -37,6 +37,7 @@ class ButterDb {
     static _setDefaults() {
         let defaults = {
             tasks: [],
+            packages: [],
             diagnostic: {
                 schema_version_init: ButterDb.SCHEMA_VERSION,
                 first_run: new Date()

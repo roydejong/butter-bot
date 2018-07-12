@@ -2,11 +2,11 @@ const fs = require('fs');
 const winston = require('winston');
 
 /**
- * Utility class for .
+ * Utility class for logging.
  */
 class ButterLog {
     /**
-     * Initializes the .
+     * Initializes the logger and its outputs.
      */
     static init(level) {
         try {
