@@ -68,7 +68,9 @@ class ButterBot {
             if (pkgToInstall) {
                 Bpm.install(pkgToInstall, true)
                     .catch((err) => {
-                        // Install failed, but should already have been logged by installer or npm
+                        // Install failed, but should already have been logged by installer or npm.
+                        // Ensure we exit with a non-zero exit code.
+                        process.exit(-1);
                     });
 
                 return false;
