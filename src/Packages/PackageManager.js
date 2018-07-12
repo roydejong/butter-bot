@@ -6,7 +6,7 @@ const ButterDb = require('../Core/ButterDb');
  * BPM - Butterbot Package Manager
  * Main utility class for working with butterbot packages /submodules.
  */
-class Bpm {
+class PackageManager {
     /**
      * Installs a single package.
      *
@@ -19,11 +19,11 @@ class Bpm {
         let isInstalled = this.isInstalled(pkgName);
 
         if (isInstalled && !force) {
-            Logger.warn(`SKIP: Not installing package ${pkgName} as it is already installed.`);
+            Logger.warn(`[bpm] SKIP: Not installing package ${pkgName} as it is already installed.`);
             return false;
         }
 
-        Logger.info(`Going to install npm package: ${pkgName}.`);
+        Logger.info(`[bpm] Going to install npm package: ${pkgName}.`);
 
         return new Promise((resolve, reject) => {
             let npmOptions = {
@@ -34,19 +34,19 @@ class Bpm {
 
             npm.load(npmOptions, (initErr) => {
                 if (initErr) {
-                    Logger.error(`Could not initialize npm: ${initErr.toString()}`);
+                    Logger.error(`[bpm] (install:${pkgName}) Could not initialize npm: ${initErr.toString()}`);
                     reject(initErr);
-                    return false;
+                    return;
                 }
 
                 npm.commands.install([pkgName], (installErr, data) => {
                     if (installErr) {
-                        Logger.error(`npm\t\t${installErr.toString()}`);
+                        Logger.error(`[bpm] (install:${pkgName}) npm\t\t${installErr.toString()}`);
                         reject(initErr);
-                        return false;
+                        return;
                     }
 
-                    Logger.info(`npm package was installed successfully.`);
+                    Logger.debug(`[bpm] (install:${pkgName}) npm package was installed successfully.`);
                     this.register(pkgName);
                     resolve(data);
                 });
@@ -77,13 +77,13 @@ class Bpm {
                 .push(pkgDataCurrent)
                 .write();
 
-            Logger.info(`Registering as new package.`);
+            Logger.debug(`[bpm] (install:${pkgName}) Registering as new package.`);
         } else {
             // Package already registerd
-            Logger.info(`Updating existing package registration.`);
+            Logger.debug(`[bpm] (install:${pkgName}) Updating existing package registration.`);
         }
 
-        // Perform update (either on new stub; or existing pacakge reg)
+        // Perform update (either on new stub; or existing package reg)
         let registerValues = {
             registered_at: new Date(),
             lock_name: pkgName
@@ -95,7 +95,7 @@ class Bpm {
             .assign(registerValues)
             .write();
 
-        Logger.info(`✅ OK. The package has been installed and registered to Butter Bot.`);
+        Logger.info(`[bpm] (install:${pkgName}) ✅ OK. The package has been installed and registered to Butter Bot.`);
     }
 
     /**
@@ -105,13 +105,37 @@ class Bpm {
      * @returns {boolean} Returns true if package appears to be available.
      */
     static isInstalled(pkgName) {
+        if (pkgName.indexOf('@')) {
+            // Remove npm @tags from the package name
+            let tagIdx = pkgName.indexOf('@');
+            pkgName = pkgName.substr(0, tagIdx);
+        }
+
+        // Strategy #1: Use require.resolve to see if we get a result
         try {
             require.resolve(pkgName);
             return true;
         } catch (e) {
-            return false;
+            console.debug(e);
         }
+
+        // Strategy #2: Attempt direct require
+        try {
+            let module = require(pkgName);
+
+            if (module) {
+                return true;
+            }
+        } catch (e) {
+            if (e.code === 'MODULE_NOT_FOUND') {
+                return false;
+            }
+
+            console.debug(e);
+        }
+
+        return false;
     }
 }
 
-module.exports = Bpm;
+module.exports = PackageManager;

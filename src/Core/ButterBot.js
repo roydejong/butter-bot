@@ -35,19 +35,29 @@ class ButterBot {
         try {
             ButterDb.init(this.dbFilename);
         } catch (dbErr) {
-            ButterLog.error(`Could not open database file => ${dbErr.toString()}`);
+            ButterLog.error(`[init] Could not open database file => ${dbErr.toString()}.`);
             return;
         }
 
-        ButterLog.info(`Using database file ${ButterDb.getFilename()}`);
+        ButterLog.info(`[init] Using database file ${ButterDb.getFilename()}.`);
 
         // Process command line arguments - level two (package maintenance etc)
         if (!this._processArgv(argv, true)) {
             return false;
         }
 
-        ButterLog.info(`✅ Butter Bot has started successfully.`);
-        return true;
+        // Initialize package system
+        const PkgInit = require('../Packages/PackageInitializer');
+
+        return PkgInit.bootstrapPackages()
+            .then(() => {
+                ButterLog.info(`✅ Butter Bot has started successfully.`);
+            })
+            .catch((err) => {
+                ButterLog.error(`[init] Failed to initialize package system.`);
+                console.error(err);
+                process.exit(-1);
+            });
     }
 
     /**
@@ -61,17 +71,22 @@ class ButterBot {
     static _processArgv(argv, levelTwo) {
         if (levelTwo) {
             // --- Package maintenance ---------------------------------------------------------------------------------
-            const Bpm = require('../Packages/Bpm');
+            const Bpm = require('../Packages/PackageManager');
+            const ButterLog = require('./ButterLog').util.getLogger();
 
             let pkgToInstall = argv["install"] || argv.i || null;
 
             if (pkgToInstall) {
-                Bpm.install(pkgToInstall, true)
-                    .catch((err) => {
-                        // Install failed, but should already have been logged by installer or npm.
-                        // Ensure we exit with a non-zero exit code.
-                        process.exit(-1);
-                    });
+                if (typeof pkgToInstall === "string" && pkgToInstall.length) {
+                    Bpm.install(pkgToInstall, true)
+                        .catch(() => {
+                            // Install failed, but should already have been logged by installer or npm.
+                            // Ensure we exit with a non-zero exit code.
+                            process.exit(-1);
+                        });
+                } else {
+                    ButterLog.error(`Usage: butterbot (--install|-i) <packageName>`);
+                }
 
                 return false;
             }
