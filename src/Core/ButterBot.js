@@ -66,7 +66,7 @@ class ButterBot {
             let pkgToInstall = argv["install"] || argv.i || null;
 
             if (pkgToInstall) {
-                Bpm.install(pkgToInstall);
+                Bpm.install(pkgToInstall, true);
                 return false;
             }
         } else {
