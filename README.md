@@ -30,3 +30,21 @@ Before the Butter Bot does anything useful, you need to give it purpose. You wil
 ### Command line options
 
 For an overview of all command line and usage options, use `butterbot --help`. You can also view the raw [help text](etc/help+usage.txt).
+
+## Package management
+
+Butter Bot is modular. To add or extend its functionality, you can install packages that have been designed to work with it.
+
+These packages are usually published on npm, and contain a `butterbot.json` manifest file that describes what functionality it wants to expose to Butter Bot.
+
+For more information on how packages are structured, or how to develop new (sub) packages for Butter Bot, please refer to the [package development document](docs/package-development.md).
+
+### Installing a package
+
+To install and register a new Butter Bot package, simply run:
+
+    butterbot -i bb-sample-package
+ 
+This will perform the npm installation as needed (without modifying our package.json), and register the package to the Butter Bot database file.
+
+ Once registered, Butter Bot will make sure the packages are available and installed as the correct version when it starts.

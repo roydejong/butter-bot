@@ -28,7 +28,8 @@ class Bpm {
         return new Promise((resolve, reject) => {
             let npmOptions = {
                 loaded: false,
-                global: false
+                global: false,
+                save: false
             };
 
             npm.load(npmOptions, (initErr) => {
@@ -49,7 +50,7 @@ class Bpm {
                         return false;
                     }
 
-                    Logger.info(`Package was installed.`);
+                    Logger.info(`npm package was installed successfully.`);
                     resolve(data);
                 });
             });
