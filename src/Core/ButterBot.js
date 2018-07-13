@@ -9,9 +9,20 @@ class ButterBot {
     /**
      * Main entry point for Butterbot.
      * Starts the application and begins the task queue.
+     *
+     * @param {string[]} argv - Command line arguments, usually provided by `process.argv`. Must be pre-sliced.
+     * @param {boolean} bootstrapOnly - If true, only bootstrap the app and do not begin main event loop.
      */
-    static start() {
-        let argv = minimist(process.argv.slice(2));
+    static start(argv, bootstrapOnly) {
+        // Parse command line arguments
+        if (argv) {
+            try {
+                argv = minimist(argv);
+            } catch (e) {
+                console.error('Command line arguments could not be parsed.');
+            }
+        }
+        if (!argv) argv = {};
 
         // Process command line arguments
         if (!this._processArgv(argv, false)) {
@@ -25,7 +36,7 @@ class ButterBot {
 
         // Init logging / console output
         const ButterLogUtil = require('./ButterLog');
-        ButterLogUtil.init(this.quietMode ? "warn" : "info");
+        ButterLogUtil.init(this.noStdout ? null : (this.quietMode ? "warn" : "info"));
         const logger = ButterLogUtil.getLogger();
 
         // Initialize database
@@ -51,10 +62,12 @@ class ButterBot {
 
         return PkgInit.bootstrapPackages()
             .then(() => {
-                this.taskEngine = new TaskEngine();
-                this.taskEngine.scheduleNext(true);
+                if (!bootstrapOnly) {
+                    this.taskEngine = new TaskEngine();
+                    this.taskEngine.scheduleNext(true);
 
-                logger.info(`✅ Butter Bot has started successfully.`);
+                    logger.info(`✅ Butter Bot has started successfully.`);
+                }
             })
             .catch((err) => {
                 logger.error(`[init] Failed to initialize package system.`);
@@ -95,7 +108,6 @@ class ButterBot {
             }
         } else {
             // --- Help / usage text -----------------------------------------------------------------------------------
-
             if (argv["help"] || argv.h) {
                 this._logVersionHeader(true);
                 this._logHelpText();
@@ -108,7 +120,6 @@ class ButterBot {
             }
 
             // --- Normal usage ----------------------------------------------------------------------------------------
-
             /**
              * Override path to the database file (via `--db` or `-d`).
              * If left blank, default database name is used (ButterDb.DEFAULT_FILENAME).
@@ -124,6 +135,14 @@ class ButterBot {
              * @type {*|null}
              */
             this.quietMode = !!(argv["quiet"] || argv["silent"] || argv.q || false);
+
+            /**
+             * Disable stdout (console) output (via `--no-stdout`).
+             * Does not affect logging.
+             *
+             * @type {boolean}
+             */
+            this.noStdout = (!argv["stdout"] || false);
         }
 
         return true;

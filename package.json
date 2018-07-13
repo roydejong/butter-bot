@@ -4,7 +4,8 @@
   "description": "What is my purpose?",
   "main": "src/index.js",
   "scripts": {
-    "start": "node ."
+    "start": "node .",
+    "test": "mocha --reporter spec --require test/_bootstrap.js"
   },
   "bin": {
     "butterbot": "./src/index.js"
@@ -36,5 +37,9 @@
     "node-version-compare": "^1.0.1",
     "npm": "^6.1.0",
     "winston": "^3.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
   }
 }

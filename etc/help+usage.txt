@@ -10,6 +10,7 @@ Usage: butterbot [options]
     -q, --quiet             Suppress informational output and logging; reduce to warnings and errors.
     -d, --db <path>         Define a custom database file to use, relative to working directory.
                             Defaults to `data/butterdb.json` if unspecified.
+    --no-stdout             Turn off all stdout (console) output. Does not affect logging.
 
 Source code, documentation and official issue tracker available via GitHub:
 

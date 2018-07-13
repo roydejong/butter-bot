@@ -10,4 +10,4 @@
  * @copyright Copyright (c) 2018 Roy de Jong
  */
 
-require('./Core/ButterBot').start();
+require('./Core/ButterBot').start(process.argv.slice(2), false);

@@ -8,6 +8,7 @@ class ButterLog {
     /**
      * Initializes the logger and its outputs.
      *
+     * @param {string} level - Log level for console output. If null or undefined, console output is disabled.
      * @return {object} Winston logger instance
      */
     static init(level) {
@@ -31,15 +32,17 @@ class ButterLog {
             ]
         });
 
-        this.logger.add(new winston.transports.Console({
-            level: level || "info",
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.timestamp(),
-                winston.format.align(),
-                winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
-            )
-        }));
+        if (level) {
+            this.logger.add(new winston.transports.Console({
+                level: level || "info",
+                format: winston.format.combine(
+                    winston.format.colorize(),
+                    winston.format.timestamp(),
+                    winston.format.align(),
+                    winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+                )
+            }));
+        }
 
         if (!fs.existsSync('./logs')) {
             this.logger.warn('Could not create `logs` directory. Log files may not be written to disk.');
