@@ -24,10 +24,9 @@ class ButterBot {
         }
 
         // Init logging / console output
-        const ButterLogUtil = require('./ButterLog').util;
+        const ButterLogUtil = require('./ButterLog');
         ButterLogUtil.init(this.quietMode ? "warn" : "info");
-
-        const ButterLog = ButterLogUtil.logger;
+        const logger = ButterLogUtil.getLogger();
 
         // Initialize database
         const ButterDb = require('./ButterDb');
@@ -35,11 +34,11 @@ class ButterBot {
         try {
             ButterDb.init(this.dbFilename);
         } catch (dbErr) {
-            ButterLog.error(`[init] Could not open database file => ${dbErr.toString()}.`);
+            logger.error(`[init] Could not open database file => ${dbErr.toString()}.`);
             return;
         }
 
-        ButterLog.info(`[init] Using database file ${ButterDb.getFilename()}.`);
+        logger.info(`[init] Using database file ${ButterDb.getFilename()}.`);
 
         // Process command line arguments - level two (package maintenance etc)
         if (!this._processArgv(argv, true)) {
@@ -48,13 +47,17 @@ class ButterBot {
 
         // Initialize package system
         const PkgInit = require('../Packages/PackageInitializer');
+        const TaskEngine = require('../Tasks/TaskEngine');
 
         return PkgInit.bootstrapPackages()
             .then(() => {
-                ButterLog.info(`✅ Butter Bot has started successfully.`);
+                this.taskEngine = new TaskEngine();
+                this.taskEngine.scheduleNext(true);
+
+                logger.info(`✅ Butter Bot has started successfully.`);
             })
             .catch((err) => {
-                ButterLog.error(`[init] Failed to initialize package system.`);
+                logger.error(`[init] Failed to initialize package system.`);
                 console.error(err);
                 process.exit(-1);
             });
@@ -72,7 +75,7 @@ class ButterBot {
         if (levelTwo) {
             // --- Package maintenance ---------------------------------------------------------------------------------
             const Bpm = require('../Packages/PackageManager');
-            const ButterLog = require('./ButterLog').util.getLogger();
+            const logger = require('./ButterLog').logger;
 
             let pkgToInstall = argv["install"] || argv.i || null;
 
@@ -85,7 +88,7 @@ class ButterBot {
                             process.exit(-1);
                         });
                 } else {
-                    ButterLog.error(`Usage: butterbot (--install|-i) <packageName>`);
+                    logger.error(`Usage: butterbot (--install|-i) <packageName>`);
                 }
 
                 return false;

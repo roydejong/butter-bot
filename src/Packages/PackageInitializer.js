@@ -1,6 +1,6 @@
 const ButterDb = require('../Core/ButterDb');
 const PackageManager = require('./PackageManager');
-const Logger = require('../Core/ButterLog').util.getLogger();
+const Logger = require('../Core/ButterLog').logger;
 
 /**
  * Utility class for initializing the Butter Bot package system on startup.

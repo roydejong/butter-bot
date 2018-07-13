@@ -7,6 +7,8 @@ const winston = require('winston');
 class ButterLog {
     /**
      * Initializes the logger and its outputs.
+     *
+     * @return {object} Winston logger instance
      */
     static init(level) {
         try {
@@ -16,6 +18,7 @@ class ButterLog {
         } catch (e) { }
 
         this.logger = winston.createLogger({
+            name: "butterlog",
             level: "info",
             format: winston.format.combine(
                 winston.format.timestamp(),
@@ -41,19 +44,22 @@ class ButterLog {
         if (!fs.existsSync('./logs')) {
             this.logger.warn('Could not create `logs` directory. Log files may not be written to disk.');
         }
+
+        return this.logger;
     }
 
     /**
      * Helper function for module export, to fetch logger instance.
      *
-     * @returns {*}
+     * @returns {object|null}
      */
     static getLogger() {
-        return this.logger;
+        if (this.logger) {
+            return this.logger;
+        }
+
+        return winston.loggers.get('butterlog') || null;
     }
 }
 
-module.exports = {
-    util: ButterLog,
-    default: ButterLog.getLogger
-};
+module.exports = ButterLog;

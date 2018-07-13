@@ -1,4 +1,4 @@
-const Logger = require('../Core/ButterLog').util.getLogger();
+const logger = require('../Core/ButterLog').logger;
 const npm = require('npm');
 const ButterDb = require('../Core/ButterDb');
 
@@ -20,12 +20,12 @@ class PackageManager {
             let isInstalled = PackageManager.isInstalled(pkgTag);
 
             if (isInstalled && !force) {
-                Logger.warn(`[bpm] SKIP: Not installing package ${pkgTag} as it is already installed.`);
+                logger.warn(`[bpm] SKIP: Not installing package ${pkgTag} as it is already installed.`);
                 reject("Package already installed, and not forcing installation.");
                 return;
             }
 
-            Logger.info(`[bpm] Going to install npm package: ${pkgTag}.`);
+            logger.info(`[bpm] Going to install npm package: ${pkgTag}.`);
 
             try {
                 let npmOptions = {
@@ -37,22 +37,22 @@ class PackageManager {
 
                 npm.load(npmOptions, (initErr) => {
                     if (initErr) {
-                        Logger.error(`[bpm] (install:${pkgTag}) Could not initialize npm: ${initErr.toString()}`);
+                        logger.error(`[bpm] (install:${pkgTag}) Could not initialize npm: ${initErr.toString()}`);
                         reject("Could not initialize npm.");
                         return;
                     }
 
                     npm.commands.install([pkgTag], (installErr, data) => {
                         if (installErr) {
-                            Logger.error(`[bpm] (install:${pkgTag}) npm\t\t${installErr.toString()}`);
+                            logger.error(`[bpm] (install:${pkgTag}) npm\t\t${installErr.toString()}`);
                             reject("npm returned an error during installation.");
                             return;
                         }
 
-                        Logger.debug(`[bpm] (install:${pkgTag}) npm package installation completed.`);
+                        logger.debug(`[bpm] (install:${pkgTag}) npm package installation completed.`);
 
                         if (!this.isInstalled(pkgTag)) {
-                            Logger.error(`[bpm] (install:${pkgTag}) Package was installed, but module cannot be loaded (sanity check failed).`);
+                            logger.error(`[bpm] (install:${pkgTag}) Package was installed, but module cannot be loaded (sanity check failed).`);
                             reject("Sanity check failed, package does not appear to be installed correctly.");
                             return;
                         }
@@ -90,10 +90,10 @@ class PackageManager {
                 .push(pkgDataCurrent)
                 .write();
 
-            Logger.debug(`[bpm] (install:${pkgName}) Registering as new package.`);
+            logger.debug(`[bpm] (install:${pkgName}) Registering as new package.`);
         } else {
             // Package already registerd
-            Logger.debug(`[bpm] (install:${pkgName}) Updating existing package registration.`);
+            logger.debug(`[bpm] (install:${pkgName}) Updating existing package registration.`);
         }
 
         // Perform update (either on new stub; or existing package reg)
@@ -108,7 +108,7 @@ class PackageManager {
             .assign(registerValues)
             .write();
 
-        Logger.info(`[bpm] (install:${pkgName}) ✅ OK. The package has been installed and registered to Butter Bot.`);
+        logger.info(`[bpm] (install:${pkgName}) ✅ OK. The package has been installed and registered to Butter Bot.`);
     }
 
     /**
