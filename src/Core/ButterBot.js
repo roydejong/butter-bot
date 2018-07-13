@@ -142,7 +142,7 @@ class ButterBot {
              *
              * @type {boolean}
              */
-            this.noStdout = (!argv["stdout"] || false);
+            this.noStdout = (argv["stdout"] === false || false);
         }
 
         return true;
