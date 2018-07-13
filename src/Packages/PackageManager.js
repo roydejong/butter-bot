@@ -31,8 +31,7 @@ class PackageManager {
                 let npmOptions = {
                     loaded: false,
                     global: false,
-                    save: false,
-                    force: force,
+                    save: true,
                     audit: false
                 };
 

@@ -48,3 +48,15 @@ To install and register a new Butter Bot package, simply run:
 This will perform the npm installation as needed (without modifying our package.json), and register the package to the Butter Bot database file.
 
  Once registered, Butter Bot will make sure the packages are available and installed as the correct version when it starts.
+ 
+## Development
+
+To get started on Butter Bot development, clone the repository to your local system and install its dependencies:
+
+    git clone git@github.com:roydejong/butter-bot.git
+    cd butter-bot
+    yarn install
+     
+(We recommend using `yarn` to install dependencies. Alternatively, use `npm install`.)
+    
+

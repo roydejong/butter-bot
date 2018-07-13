@@ -4,7 +4,7 @@
   "description": "I'm an opdroid seeking purpose.",
   "main": "src/index.js",
   "scripts": {
-    "start": "yarn install --non-interactive -s && node ."
+    "start": "ynode ."
   },
   "bin": {
     "butterbot": "./src/index.js"
@@ -35,7 +35,6 @@
     "minimist": "^1.2.0",
     "node-version-compare": "^1.0.1",
     "npm": "^6.1.0",
-    "winston": "^3.0.0",
-    "yarn": "^1.7.0"
+    "winston": "^3.0.0"
   }
 }
