@@ -1,10 +1,10 @@
 {
   "name": "butter-bot",
-  "version": "0.1.5",
-  "description": "I'm an opdroid seeking purpose.",
+  "version": "0.1.6",
+  "description": "What is my purpose?",
   "main": "src/index.js",
   "scripts": {
-    "start": "ynode ."
+    "start": "node ."
   },
   "bin": {
     "butterbot": "./src/index.js"
