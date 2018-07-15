@@ -3,4 +3,4 @@
  */
 
 const ButterBot = require('../src/Core/ButterBot');
-ButterBot.start(["-q -d data/mocha.json --no-stdout"], true);
+ButterBot.start(["-q", "-d data/mocha.json", "--no-stdout"], true);
