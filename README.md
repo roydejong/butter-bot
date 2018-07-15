@@ -48,8 +48,21 @@ To install and register a new Butter Bot package, simply run:
 This will perform the npm installation as needed (without modifying our package.json), and register the package to the Butter Bot database file.
 
  Once registered, Butter Bot will make sure the packages are available and installed as the correct version when it starts.
+
+## Documentation
+
+For further reading, please check out the [`/docs`](./docs) folder in this repository. Topics that might interest you include:
+
+### General use
+
+- [Writing schedule expressions for tasks](./docs/schedule-expressions.md)
+
+### Technical details & development info
+
+- [Developing packages for Butter Bot](./docs/package-development.md)
+- [How the task system works + definitions](./docs/tasks+scheduling.md)
  
-## Development
+## Contributing and development
 
 To get started on Butter Bot development, clone the repository to your local system and install its dependencies:
 
@@ -57,6 +70,6 @@ To get started on Butter Bot development, clone the repository to your local sys
     cd butter-bot
     yarn install
      
-(We recommend using `yarn` to install dependencies. Alternatively, use `npm install`.)
-    
+(We recommend using `yarn` to install dependencies. Alternatively, you can use good old `npm install`.)
 
+We welcome good quality pull requests to this repository. Opening a ticket first greatly increases your chances of the pull request being accepted quickly, and ensures you won't be wasting your time.
