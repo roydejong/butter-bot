@@ -7,10 +7,12 @@ Usage: butterbot [options]
     -u, --uninstall <pkg>   Remove a BB package / submodule and unregister it.
     -l, --list              Lists all registered BB packages.
 
-    -q, --quiet             Suppress informational output and logging; reduce to warnings and errors.
     -d, --db <path>         Define a custom database file to use, relative to working directory.
                             Defaults to `data/butterdb.json` if unspecified.
-    --no-stdout             Turn off all stdout (console) output. Does not affect logging.
+
+    -q, --quiet             Suppress informational output and logging; reduce to warnings and errors.
+    --no-stdout             Turn off all stdout (console) output. Does not affect regular logging.
+    --debug                 Enable full, verbose debug logging. Takes precedence over quiet mode.
 
 Source code, documentation and official issue tracker available via GitHub:
 

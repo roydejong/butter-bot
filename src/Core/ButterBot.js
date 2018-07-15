@@ -36,7 +36,7 @@ class ButterBot {
 
         // Init logging / console output
         const ButterLogUtil = require('./ButterLog');
-        ButterLogUtil.init(this.noStdout ? null : (this.quietMode ? "warn" : "info"));
+        ButterLogUtil.init(this.debugMode, this.quietMode, this.noStdout);
         const logger = ButterLogUtil.getLogger();
 
         // Initialize database
@@ -80,7 +80,7 @@ class ButterBot {
      * Processes command line arguments and configures Butterbot accordingly.
      *
      * @private
-     * @param {object} argv - Parsed argv object.
+     * @param {Object} argv - Parsed argv object.
      * @param {boolean} levelTwo - If true, process level two arguments (package maintenance commands).
      * @return {boolean} Returns true if execution should continue; false if execution should halt.
      */
@@ -132,9 +132,9 @@ class ButterBot {
              * Set quiet mode (via `--quiet`, `--silent` or `-q`).
              * Disables most logging except errors and warnings.
              *
-             * @type {*|null}
+             * @type {boolean}
              */
-            this.quietMode = !!(argv["quiet"] || argv["silent"] || argv.q || false);
+            this.quietMode = !!(argv["quiet"] || argv["silent"] || argv.q);
 
             /**
              * Disable stdout (console) output (via `--no-stdout`).
@@ -142,7 +142,15 @@ class ButterBot {
              *
              * @type {boolean}
              */
-            this.noStdout = (argv["stdout"] === false || false);
+            this.noStdout = argv["stdout"] === false;
+
+            /**
+             * Debug mode flag (via `--debug`).
+             * Enables full, verbose logging.
+             *
+             * @type {boolean}
+             */
+            this.debugMode = !!argv["debug"];
         }
 
         return true;
@@ -165,6 +173,10 @@ class ButterBot {
      * @private
      */
     static _logVersionHeader(extraSpacing) {
+        if (this.noStdout) {
+            return;
+        }
+
         console.log(`🤖 Butter Bot [Version ${SelfPackage.version}] (https://butterbot.io)`);
         console.log(`Copyright (c) 2018 Roy de Jong, MIT licensed`);
 
