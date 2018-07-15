@@ -82,6 +82,7 @@ describe('Schedule expression parser', () => {
         let input = "every friday and saturday at 12:34 and at 3pm";
         let output = Schedule.parsePart(input);
 
+        expect(output.days).to.deep.equal([5, 6]);
         expect(output.times.length).to.equal(2);
         expect(output.times[0].toString()).to.equal("12:34:00");
         expect(output.times[1].toString()).to.equal("15:00:00");
@@ -165,6 +166,18 @@ describe('Schedule expression parser', () => {
     // ---
 
 
+    it('Interval parser: Can combine intervals with (multiple) days using "on" (every X Y on Z1 and Z2)', () => {
+        let input = "every 5 minutes on friday and saturday";
+        let output = Schedule.parsePart(input);
+
+        expect(output.days).to.deep.equal([5, 6]);
+        expect(output.interval).to.equal(60 * 5);
+    });
+
+
+    // ---
+
+
     it('Time parser: Parses HH:mm format', () => {
         expect(Schedule.parsePart("at 12:34").times[0].toString()).to.equal("12:34:00");
     });
@@ -229,5 +242,11 @@ describe('Schedule expression parser', () => {
         let input = "every wednesday at 15:00 and friday";
 
         expect(() => { Schedule.parsePart(input) }).to.throw();
+    });
+
+    it('Throws syntax error: Cannot use numbers after "every" except with an interval unit', () => {
+        let input = "every 1 monday";
+
+        expect(() => { Schedule.parsePart(input) }).to.throw("expected a unit");
     });
 });

@@ -79,6 +79,7 @@ class Schedule {
         let sExpectingAnd = false;      // -- Indicates whether a T_AND token is legal next.
         let sExpectingTime = true;      // -- Indicates whether a time string is legal next.
         let sExpectingAt = true;        // -- Indicates whether a T_AT token is legal next.
+        let sExpectingOn = true;        // -- Indicates whether a T_ON token is legal next.
         let sDidReadTime = false;       // -- Indicates whether a time string was read, used for syntax validation.
         let sExpectingInterval = false; // -- Indicates whether an interval expression (every X Y) is legal next.
         let sReadingIntervalPart = false; // -- Indicates whether we just read an interval value, and are now expecting a unit name.
@@ -95,6 +96,7 @@ class Schedule {
             sExpectingTime = false;
             sExpectingAnd = false;
             sExpectingDays = false;
+            sExpectingOn = false;
         };
 
         // Iterate and tokenize sub-parts one by one
@@ -139,6 +141,7 @@ class Schedule {
                 }
             }
 
+            // Interval partial read: read the unit name after reading an interval number
             if (sReadingIntervalPart) {
                 if (Schedule.T_INTERVAL_NAMES_WITH_VALUE.indexOf(_nextPart) >= 0) {
                     // A valued interval was specified (e.g. "every 5 seconds", "every 3 weeks", etc).
@@ -146,8 +149,11 @@ class Schedule {
 
                     fnExpectNothing();
                     sReadingIntervalPart = false;
+                    sExpectingOn = true; // allow "every X Y on Z1 and Z2" type bridges (interval -> day)
                     continue;
                 }
+
+                throw new Error(`Could not parse schedule expression: Got "${_nextPart}" but expected a unit (e.g. seconds, hours, days) to follow number ${dIntervalNumber}.`);
             }
 
             // Token detect: day names
@@ -216,6 +222,13 @@ class Schedule {
                 continue;
             }
 
+            // Token connect: interval <-> day(s) connector ON
+            if (sExpectingOn && _nextPart === Schedule.T_ON) {
+                fnExpectNothing();
+                sExpectingDays = true;
+                continue;
+            }
+
             // We are still here (no statement was reached that called "continue"). This means we did not understand
             // the token in `_nextPart`. We'll try to throw a useful syntax error.
             if (sReadingInitial) {
@@ -251,6 +264,7 @@ class Schedule {
 
 Schedule.T_AND = "and";
 Schedule.T_AT = "at";
+Schedule.T_ON = "on";
 
 Schedule.T_PREFIX_EVERY = "every";
 Schedule.T_PREFIX_THIS = "this";
