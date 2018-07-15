@@ -22,11 +22,21 @@ class Schedule {
      * @param {?number[]} times - A list of DayTimes that indicates at what time this task should run on each day.
      *                            If set (list of day times): task MUST TRY to run on or close to these times.
      *                            If unset (NULL): task MAY run ANY TIME OF DAY.
+     *                            Cannot be combined with `interval` value right now.
+     *
+     * @param {?number} interval - An interval in seconds, if such an interval is provided.
+     *                             This is used for recurring tasks, e.g. "every minute" task would have a value of 60.
+     *                             Cannot be combined with `times` values right now.
      */
-    constructor(prefix, days, times) {
+    constructor(prefix, days, times, interval) {
         this.prefix = prefix;
         this.days = (days && days.length && days) || null;
         this.times = (times && times.length && times) || null;
+        this.interval = interval || null;
+
+        if (this.times && this.times.length && this.interval > 0) {
+            throw new Error('Cannot set both "times" and "interval" for a single schedule item.');
+        }
     }
 
     /**
@@ -70,10 +80,13 @@ class Schedule {
         let sExpectingTime = true;      // -- Indicates whether a time string is legal next.
         let sExpectingAt = true;        // -- Indicates whether a T_AT token is legal next.
         let sDidReadTime = false;       // -- Indicates whether a time string was read, used for syntax validation.
+        let sExpectingInterval = false; // -- Indicates whether an interval expression (every X Y) is legal next.
 
         let dPrefix = Schedule.T_PREFIX_THIS;
         let dDayNums = [];
         let dDayTimes = [];
+        let dIntervalNumber = null;
+        let dIntervalValue = 0;
 
         // Iterate and tokenize sub-parts one by one
         for (let i = 0; i < parts.length; i++) {
@@ -91,6 +104,23 @@ class Schedule {
                     sExpectingAnd = false;
                     sExpectingTime = false;
                     sExpectingAt = false;
+                    sExpectingInterval = (dPrefix === Schedule.T_PREFIX_EVERY);
+                    continue;
+                }
+            }
+
+            // Token detect: interval number (e.g. "every 5 minutes")
+            if (sExpectingInterval) {
+                if (Schedule.T_INTERVAL_NAMES_WITH_NO_VALUE.indexOf(_nextPart) >= 0) {
+                    // A no-value interval was specified (e.g. "every second", "every week", etc).
+                    dIntervalNumber = null;
+                    dIntervalValue = Schedule.calculateInterval(1, _nextPart); // 1 <unit>
+
+                    sExpectingDays = false;
+                    sExpectingAnd = false;
+                    sExpectingTime = false;
+                    sExpectingAt = false;
+                    sExpectingInterval = false;
                     continue;
                 }
             }
@@ -127,6 +157,7 @@ class Schedule {
                 sExpectingAnd = true;
                 sExpectingTime = false;
                 sExpectingAt = true;
+                sExpectingInterval = false;
                 continue;
             }
 
@@ -144,6 +175,7 @@ class Schedule {
                     sExpectingAnd = true;
                     sExpectingTime = false;
                     sExpectingAt = false;
+                    sExpectingInterval = false;
                     continue;
                 }
             }
@@ -154,6 +186,7 @@ class Schedule {
                 sExpectingAnd = false;
                 sExpectingTime = false;
                 sExpectingAt = true; // "and at" bridges are allowed
+                sExpectingInterval = false;
                 continue;
             }
 
@@ -163,6 +196,7 @@ class Schedule {
                 sExpectingAnd = false;
                 sExpectingTime = true;
                 sExpectingAt = false;
+                sExpectingInterval = false;
                 continue;
             }
 
@@ -176,14 +210,31 @@ class Schedule {
             throw new Error(`Could not parse schedule expression: Unrecognized or unexpected token: "${_nextPart}".`);
         }
 
-        if (sDidReadPrefix && !dDayNums.length) {
-            throw new Error(`Could not parse schedule expression: Not enough input: "${partialExpression}"`);
+        if (sDidReadPrefix && !dDayNums.length && !dDayTimes.length && !dIntervalValue) {
+            throw new Error(`Could not parse schedule expression: Not enough input to generate a schedule: "${partialExpression}"`);
         }
 
-        return new Schedule(dPrefix, dDayNums, dDayTimes);
+        return new Schedule(dPrefix, dDayNums, dDayTimes, dIntervalValue);
     }
 
+    /**
+     * Utility for calculating an interval.
+     *
+     * @param {number} value - The amount of the interval (e.g. "1" if the unit is "hours" for "1 hour").
+     * @param {string} unitName - The unit name of the interval (e.g. "days" if the value is 3 for "3 days").
+     * @returns {number}
+     */
+    static calculateInterval(value, unitName) {
+        // We'll run the modification on Moment.js and calculate the generated offset from a neutral starting point.
+        let now = moment("2000-01-01 00:00:00.000");
+        let modified = moment(now).add(value, unitName);
+
+        return Math.abs(now.diff(modified, 'seconds'));
+    }
 }
+
+Schedule.T_AND = "and";
+Schedule.T_AT = "at";
 
 Schedule.T_PREFIX_EVERY = "every";
 Schedule.T_PREFIX_THIS = "this";
@@ -194,9 +245,24 @@ Schedule.T_DAY_TODAY = "today";
 Schedule.T_DAY_TOMORROW = "tomorrow";
 Schedule.T_DAYS = Schedule.T_DAY_WEEKDAYS.concat([Schedule.T_DAY_TODAY, Schedule.T_DAY_TOMORROW]);
 
-Schedule.T_AND = "and";
-Schedule.T_AT = "at";
-
 Schedule.T_TIME_FORMATS = ["HH:mm:ss", "HH:mm", "h:mm:ssa", "h:mma", "ha"];
+
+Schedule.T_INTERVAL_SECONDS = "seconds";
+Schedule.T_INTERVAL_MINUTES = "minutes";
+Schedule.T_INTERVAL_HOURS = "hours";
+Schedule.T_INTERVAL_DAYS = "days";
+Schedule.T_INTERVAL_WEEKS = "weeks";
+Schedule.T_INTERVAL_MONTHS = "months";
+Schedule.T_INTERVAL_NAMES_WITH_VALUE = [Schedule.T_INTERVAL_SECONDS, Schedule.T_INTERVAL_MINUTES,
+    Schedule.T_INTERVAL_HOURS, Schedule.T_INTERVAL_DAYS, Schedule.T_INTERVAL_WEEKS, Schedule.T_INTERVAL_MONTHS];
+
+Schedule.T_INTERVAL_SECOND = "second";
+Schedule.T_INTERVAL_MINUTE = "minute";
+Schedule.T_INTERVAL_HOUR = "hour";
+Schedule.T_INTERVAL_DAY = "day";
+Schedule.T_INTERVAL_WEEK = "week";
+Schedule.T_INTERVAL_MONTH = "month";
+Schedule.T_INTERVAL_NAMES_WITH_NO_VALUE = [Schedule.T_INTERVAL_SECOND, Schedule.T_INTERVAL_MINUTE,
+    Schedule.T_INTERVAL_HOUR, Schedule.T_INTERVAL_DAY, Schedule.T_INTERVAL_WEEK, Schedule.T_INTERVAL_MONTH];
 
 module.exports = Schedule;

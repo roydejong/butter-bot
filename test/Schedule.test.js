@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const Schedule = require('../src/Scheduling/Schedule');
+const DayTime = require('../src/Scheduling/DayTime');
 
 let fnGetWeekDay = (modifier) => {
     let now = new Date();
@@ -21,6 +22,23 @@ let fnGetWeekDay = (modifier) => {
 
     return weekDay;
 };
+
+describe('Schedule struct', () => {
+    it('Constructor throws error: Cannot set both "times" and "interval" values', () => {
+        expect(() => { new Schedule("every", [0, 1, 2, 3], [new DayTime(15, 43, 21)], 3600) })
+            .to.throw('Cannot set both "times" and "interval" for a single schedule item.');
+    });
+});
+
+describe('Schedule interval calculation', () => {
+    it('Calculates intervals correctly: single unit', () => {
+        expect(Schedule.calculateInterval(1, "minute")).to.equal(60);
+    });
+
+    it('Calculates intervals correctly: multiple units', () => {
+        expect(Schedule.calculateInterval(2, "minutes")).to.equal(120);
+    });
+});
 
 describe('Schedule expression parser', () => {
     it('Empty expression strings are ignored, and result in an empty array', () => {
@@ -77,6 +95,30 @@ describe('Schedule expression parser', () => {
         let output = Schedule.parsePart(input);
 
         expect(output.days).to.deep.equal([fnGetWeekDay(+1)]);
+    });
+
+    it('Interval parser: Parses "every second" format', () => {
+        expect(Schedule.parsePart("every second").interval).to.equal(1);
+    });
+
+    it('Interval parser: Parses "every minute" format', () => {
+        expect(Schedule.parsePart("every minute").interval).to.equal(60);
+    });
+
+    it('Interval parser: Parses "every hour" format', () => {
+        expect(Schedule.parsePart("every hour").interval).to.equal(3600);
+    });
+
+    it('Interval parser: Parses "every day" format', () => {
+        expect(Schedule.parsePart("every day").interval).to.equal(86400);
+    });
+
+    it('Interval parser: Parses "every week" format', () => {
+        expect(Schedule.parsePart("every week").interval).to.equal(604800);
+    });
+
+    it('Interval parser: Parses "every month" format', () => {
+        expect(Schedule.parsePart("every month").interval).to.equal(2678400); // 31 days, which is how moment.js defines a month
     });
 
     it('Time parser: Parses HH:mm format', () => {
