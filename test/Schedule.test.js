@@ -48,6 +48,10 @@ describe('Schedule expression parser', () => {
         expect(output).to.be.an('array').that.is.empty;
     });
 
+
+    // ---
+
+
     it('Parses prefixed days (every X)', () => {
         let input = "every friday";
         let output = Schedule.parsePart(input);
@@ -83,6 +87,10 @@ describe('Schedule expression parser', () => {
         expect(output.times[1].toString()).to.equal("15:00:00");
     });
 
+
+    // ---
+
+
     it('Parses "today" relative to current time', () => {
         let input = "today";
         let output = Schedule.parsePart(input);
@@ -96,6 +104,10 @@ describe('Schedule expression parser', () => {
 
         expect(output.days).to.deep.equal([fnGetWeekDay(+1)]);
     });
+
+
+    // ---
+
 
     it('Interval parser: Parses "every second" format', () => {
         expect(Schedule.parsePart("every second").interval).to.equal(1);
@@ -118,8 +130,40 @@ describe('Schedule expression parser', () => {
     });
 
     it('Interval parser: Parses "every month" format', () => {
-        expect(Schedule.parsePart("every month").interval).to.equal(2678400); // 31 days, which is how moment.js defines a month
+        expect(Schedule.parsePart("every month").interval).to.equal(2678400); // 31 days // TODO this will break
     });
+
+
+    // ---
+
+
+    it('Interval parser: Parses "X seconds" format', () => {
+        expect(Schedule.parsePart("every 3 seconds").interval).to.equal(1 * 3);
+    });
+
+    it('Interval parser: Parses "X minutes" format', () => {
+        expect(Schedule.parsePart("every 3 minutes").interval).to.equal(60 * 3);
+    });
+
+    it('Interval parser: Parses "X hours" format', () => {
+        expect(Schedule.parsePart("every 3 hours").interval).to.equal(3600 * 3);
+    });
+
+    it('Interval parser: Parses "X days" format', () => {
+        expect(Schedule.parsePart("every 3 days").interval).to.equal(86400 * 3);
+    });
+
+    it('Interval parser: Parses "X weeks" format', () => {
+        expect(Schedule.parsePart("every 3 weeks").interval).to.equal(604800 * 3);
+    });
+
+    it('Interval parser: Parses "X months" format', () => {
+        expect(Schedule.parsePart("every 3 months").interval).to.equal(7948800); // 31 days + 30 days + 31 days // TODO this will break
+    });
+
+
+    // ---
+
 
     it('Time parser: Parses HH:mm format', () => {
         expect(Schedule.parsePart("at 12:34").times[0].toString()).to.equal("12:34:00");
@@ -140,6 +184,10 @@ describe('Schedule expression parser', () => {
     it('Time parser: Parses ha format', () => {
         expect(Schedule.parsePart("at 12pm").times[0].toString()).to.equal("12:00:00");
     });
+
+
+    // ---
+
 
     it('Throws syntax error: Invalid first token', () => {
         let input = "invalid";

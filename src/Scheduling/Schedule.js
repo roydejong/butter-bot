@@ -81,12 +81,21 @@ class Schedule {
         let sExpectingAt = true;        // -- Indicates whether a T_AT token is legal next.
         let sDidReadTime = false;       // -- Indicates whether a time string was read, used for syntax validation.
         let sExpectingInterval = false; // -- Indicates whether an interval expression (every X Y) is legal next.
+        let sReadingIntervalPart = false; // -- Indicates whether we just read an interval value, and are now expecting a unit name.
 
         let dPrefix = Schedule.T_PREFIX_THIS;
         let dDayNums = [];
         let dDayTimes = [];
         let dIntervalNumber = null;
         let dIntervalValue = 0;
+
+        let fnExpectNothing = () => {
+            sExpectingInterval = false;
+            sExpectingAt = false;
+            sExpectingTime = false;
+            sExpectingAnd = false;
+            sExpectingDays = false;
+        };
 
         // Iterate and tokenize sub-parts one by one
         for (let i = 0; i < parts.length; i++) {
@@ -99,11 +108,9 @@ class Schedule {
                 if (Schedule.T_PREFIXES.indexOf(_nextPart) >= 0) {
                     dPrefix = _nextPart;
 
+                    fnExpectNothing();
                     sDidReadPrefix = true;
                     sExpectingDays = true;
-                    sExpectingAnd = false;
-                    sExpectingTime = false;
-                    sExpectingAt = false;
                     sExpectingInterval = (dPrefix === Schedule.T_PREFIX_EVERY);
                     continue;
                 }
@@ -116,11 +123,29 @@ class Schedule {
                     dIntervalNumber = null;
                     dIntervalValue = Schedule.calculateInterval(1, _nextPart); // 1 <unit>
 
-                    sExpectingDays = false;
-                    sExpectingAnd = false;
-                    sExpectingTime = false;
-                    sExpectingAt = false;
-                    sExpectingInterval = false;
+                    fnExpectNothing();
+                    continue;
+                }
+
+                // Check if it's an number value, which could be start of "<value> <unit>" expression, e.g. "2 hours"
+                let asFloat = parseFloat(_nextPart) || parseInt(_nextPart) || NaN;
+
+                if (!isNaN(asFloat) && asFloat > 0) {
+                    dIntervalNumber = asFloat;
+
+                    fnExpectNothing();
+                    sReadingIntervalPart = true;
+                    continue;
+                }
+            }
+
+            if (sReadingIntervalPart) {
+                if (Schedule.T_INTERVAL_NAMES_WITH_VALUE.indexOf(_nextPart) >= 0) {
+                    // A valued interval was specified (e.g. "every 5 seconds", "every 3 weeks", etc).
+                    dIntervalValue = Schedule.calculateInterval(dIntervalNumber, _nextPart); // 1 <unit>
+
+                    fnExpectNothing();
+                    sReadingIntervalPart = false;
                     continue;
                 }
             }
@@ -153,11 +178,9 @@ class Schedule {
                     dDayNums.push(tomorrow);
                 }
 
-                sExpectingDays = false;
+                fnExpectNothing();
                 sExpectingAnd = true;
-                sExpectingTime = false;
                 sExpectingAt = true;
-                sExpectingInterval = false;
                 continue;
             }
 
@@ -171,32 +194,25 @@ class Schedule {
                     dDayTimes.push(DayTime.fromMoment(timeParsed));
 
                     sDidReadTime = true;
-                    sExpectingDays = false;
+
+                    fnExpectNothing();
                     sExpectingAnd = true;
-                    sExpectingTime = false;
-                    sExpectingAt = false;
-                    sExpectingInterval = false;
                     continue;
                 }
             }
 
             // Token detect: day connector AND
             if (sExpectingAnd && _nextPart === Schedule.T_AND) {
+                fnExpectNothing();
                 sExpectingDays = (!sDidReadTime); // "and <day>" is only allowed if we did not yet read a time
-                sExpectingAnd = false;
-                sExpectingTime = false;
                 sExpectingAt = true; // "and at" bridges are allowed
-                sExpectingInterval = false;
                 continue;
             }
 
             // Token connect: day <-> time connector AT
             if (sExpectingAt && _nextPart === Schedule.T_AT) {
-                sExpectingDays = false;
-                sExpectingAnd = false;
+                fnExpectNothing();
                 sExpectingTime = true;
-                sExpectingAt = false;
-                sExpectingInterval = false;
                 continue;
             }
 
@@ -225,8 +241,8 @@ class Schedule {
      * @returns {number}
      */
     static calculateInterval(value, unitName) {
-        // We'll run the modification on Moment.js and calculate the generated offset from a neutral starting point.
-        let now = moment("2000-01-01 00:00:00.000");
+        // We'll run the modification on Moment.js and calculate the generated offset from today's date
+        let now = moment();
         let modified = moment(now).add(value, unitName);
 
         return Math.abs(now.diff(modified, 'seconds'));
