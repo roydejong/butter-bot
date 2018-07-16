@@ -2,6 +2,7 @@ const fs = require('fs');
 const logger = require('../Core/ButterLog').logger;
 const npm = require('npm');
 const ButterDb = require('../Core/ButterDb');
+const ButterbotManifest = require('./ButterbotManifest');
 
 /**
  * BPM - Butterbot Package Manager
@@ -75,27 +76,15 @@ class PackageManager {
                             }
                         }
 
-                        if (!installedPath || !installedSpec) {
-                            logger.error(`[bpm] (install:${pkgName}) npm did not install the expected module.`);
-                            reject("Sanity check failed (A), package does not appear to be installed correctly.");
+                        // Verify the package was installed OK. This is a sanity check for the most part, but also
+                        // prevents us from registering a package with no butterbot manifest.
+                        if (!installedSpec || !installedPath || !this.isInstalled(installedSpec)) {
+                            logger.error(`[bpm] (install:${pkgName}) Package was installed locally, but it is not a valid butterbot package.`);
+                            reject("Package installation failed: Not a valid butterbot package (is the manifest missing?)");
                             return;
                         }
 
-                        if (!this.isInstalled(pkgName)) {
-                            logger.error(`[bpm] (install:${pkgName}) Package was installed, but module cannot be loaded (sanity check failed).`);
-                            reject("Sanity check failed (B), package does not appear to be installed correctly.");
-                            return;
-                        }
-
-                        let manifestPathExpected = installedPath + "/butterbot.json";
-
-                        if (!fs.existsSync(manifestPathExpected)) {
-                            logger.error(`[bpm] (install:${pkgName}) Package was installed locally, but it does not look like a valid butterbot package. A manifest file was expected at path: ${manifestPathExpected}`);
-                            reject("The installed package is not a valid butterbot package.");
-                            return;
-                        }
-
-                        this.register(installedSpec, installedPath);
+                        this.registerInstalledPackage(installedSpec, installedPath);
                         resolve(installList);
                     });
                 });
@@ -125,18 +114,31 @@ class PackageManager {
     }
 
     /**
-     * Registers a package.
+     * Fetches registration info from
      *
-     * @param {string} pkgSpec - Name and tag of the package installed by npm, e.g. "tar@4.4.4".
-     * @param {string} pkgPath - Full absolute path to the installation directory in node_modules.
+     * @param {string} pkgIdent - Package name (e.g. "tar") or npm spec string (e.g. "tar@4.4.4") to check.
+     * @returns {Object|null} Returns the database object value, or NULL if package is not known to us.
      */
-    static register(pkgSpec, pkgPath) {
-        let pkgName = PackageManager.getPackageName(pkgSpec);
+    static getRegistration(pkgIdent) {
+        let pkgName = PackageManager.getPackageName(pkgIdent);
 
         let pkgDataCurrent = ButterDb.db
             .get('packages')
             .find({ id: pkgName })
             .value();
+
+        return pkgDataCurrent || null;
+    }
+
+    /**
+     * Registers a package.
+     *
+     * @param {string} pkgSpec - Name and tag of the package installed by npm, e.g. "tar@4.4.4".
+     * @param {string} pkgPath - Full absolute path to the installation directory in node_modules.
+     */
+    static registerInstalledPackage(pkgSpec, pkgPath) {
+        let pkgName = PackageManager.getPackageName(pkgSpec);
+        let pkgDataCurrent = PackageManager.getRegistration(pkgName);
 
         if (!pkgDataCurrent) {
             // Package is not yet in database, create stub
@@ -183,23 +185,17 @@ class PackageManager {
      */
     static isInstalled(pkgIdent) {
         let pkgName = this.getPackageName(pkgIdent);
+        let localReg = this.getRegistration(pkgIdent);
 
-        // Strategy #1: Use require.resolve to see if we get a result
-        try {
-            require.resolve(pkgName);
-            return true;
-        } catch (e) { }
+        if (localReg) {
+            let manifestPathExpected = localReg.path + ButterbotManifest.MANIFEST_REL_PATH;
 
-        // Strategy #2: Attempt direct require
-        try {
-            let module = require(pkgName);
+            logger.debug(`[bpm] (isInstalled:${pkgName}) Checking for manifest file at ${manifestPathExpected}`);
 
-            if (module) {
+            if (fs.existsSync(manifestPathExpected)) {
+                // Something exists at the expected location and it has a butterbot manifest
+                // We're probably good!
                 return true;
-            }
-        } catch (e) {
-            if (e.code === 'MODULE_NOT_FOUND') {
-                return false;
             }
         }
 
