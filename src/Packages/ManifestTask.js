@@ -16,7 +16,7 @@ class ManifestTask {
          *
          * @var {string}
          */
-        this.name = name;
+        this.taskName = name;
 
         /**
          * The relative require() path that Butter Bot uses to load the actual task code.
@@ -24,7 +24,7 @@ class ManifestTask {
          *
          * @var {string}
          */
-        this.require = require;
+        this.requirePath = require;
     }
 
     /**
@@ -33,17 +33,17 @@ class ManifestTask {
      * @return {boolean}
      */
     isValid() {
-        if (!this.name || !this.require) {
+        if (!this.taskName || !this.requirePath) {
             // Required fields
             return false;
         }
 
-        if (path.isAbsolute(this.require)) {
+        if (path.isAbsolute(this.requirePath)) {
             // Absolute paths are not permitted
             return false;
         }
 
-        if (this.require.indexOf('..') >= 0) {
+        if (this.requirePath.indexOf('..') >= 0) {
             // Path with traversal characters (../../) are not allowed
             return false;
         }
@@ -59,7 +59,7 @@ class ManifestTask {
      * @param {Object} data
      */
     static fromData(data) {
-        return new ManifestTask(data.name || null, data.require || null);
+        return new ManifestTask(data.name || "", data.require || "");
     }
 }
 

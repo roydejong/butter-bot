@@ -1,0 +1,8 @@
+{
+  "tasks": [
+    {
+      "name": "sample-file-task",
+      "require": "sample-file-req"
+    }
+  ]
+}

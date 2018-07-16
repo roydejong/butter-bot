@@ -2,7 +2,7 @@ const fs = require('fs');
 const logger = require('../Core/ButterLog').logger;
 const npm = require('npm');
 const ButterDb = require('../Core/ButterDb');
-const ButterbotManifest = require('./ButterbotManifest');
+const ButterbotManifest = require('./Manifest');
 
 /**
  * BPM - Butterbot Package Manager

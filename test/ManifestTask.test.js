@@ -5,8 +5,8 @@ describe('ManifestTask struct', () => {
     it('Can construct with basic input', () => {
         let mt = new ManifestTask("test-name", "test-require");
 
-        expect(mt.name).to.equal("test-name");
-        expect(mt.require).to.equal("test-require");
+        expect(mt.taskName).to.equal("test-name");
+        expect(mt.requirePath).to.equal("test-require");
     });
 
     it('Validity checks: Both fields must have values', () => {
@@ -39,7 +39,7 @@ describe('ManifestTask struct', () => {
         let expected = new ManifestTask("test-name", "test-require");
         let actual = ManifestTask.fromData({ name: "test-name", require: "test-require" });
 
-        expect(expected.name).to.equal("test-name");
-        expect(expected.require).to.equal("test-require");
+        expect(expected.taskName).to.equal("test-name");
+        expect(expected.requirePath).to.equal("test-require");
     });
 });
