@@ -1,3 +1,4 @@
+const fs = require('fs');
 const logger = require('../Core/ButterLog').logger;
 const npm = require('npm');
 const ButterDb = require('../Core/ButterDb');
@@ -83,6 +84,14 @@ class PackageManager {
                         if (!this.isInstalled(pkgName)) {
                             logger.error(`[bpm] (install:${pkgName}) Package was installed, but module cannot be loaded (sanity check failed).`);
                             reject("Sanity check failed (B), package does not appear to be installed correctly.");
+                            return;
+                        }
+
+                        let manifestPathExpected = installedPath + "/butterbot.json";
+
+                        if (!fs.existsSync(manifestPathExpected)) {
+                            logger.error(`[bpm] (install:${pkgName}) Package was installed locally, but it does not look like a valid butterbot package. A manifest file was expected at path: ${manifestPathExpected}`);
+                            reject("The installed package is not a valid butterbot package.");
                             return;
                         }
 
