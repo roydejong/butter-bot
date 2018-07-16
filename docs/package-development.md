@@ -27,7 +27,7 @@ A typical manifest file might look like this:
        "tasks": [  
           {  
              "name": "serve-butter",
-             "require": "butter-bot-butter/tasks/serve-butter.js"
+             "require": "src/tasks/ServeButter.js"
           }
        ]
     }
@@ -41,11 +41,11 @@ The manifest root may contain a `tasks` array that contains any amount of task d
 |Variable|Type|Description|Notes|
 |----|----|-------|-----|
 |**`name`**|`string`|Globally (world) unique name / identifier for this task. This name will be used internally whenever referring to this task.|Required, unique|
-|**`require`**|`string`|The value that should be used by BB in `require()`, to load the task class.|Required| 
+|**`require`**|`string`|The relative path to the module that should be `require()`'d by Butter Bot. Relative to the path the module is installed in.|Required|
 
 ## Publishing
 
-The built-in package management solution uses `npm` as its backend, and assumes that you publish your packages to npm.
+The built-in package management solution uses `npm` as its backend, and assumes that you publish your packages publicly to npm.
 
 At this time, the only supported distribution method for new packages is to publish them to npm as usual (`npm publish`).
 
@@ -53,16 +53,19 @@ At this time, the only supported distribution method for new packages is to publ
 
 Please refer to the main [README file](../README.md) for end user package management instructions.
 
-To install a package, simply run `butterbot -i` with the typical npm package conventions, and using your freshly published package name:
+In short summary, once your package has been published, you can tell `butterbot` to install and register it for you.
 
-    butterbot -i my-bb-npm-package@tag
+To install a package, simply run `butterbot -i` with the typical npm package conventions, and using your freshly published package name. For example, if your package is called `butterbot-butter` you could use:
 
-This command will install or update the corresponding npm package. This won't be saved to the `package.json` for Butter Bot itself.
+    butterbot --install butterbot-butter@latest
 
-Once the npm package has installed successfully, BB will look for and parse the manifest file. If things look OK, the package will be registered in the BB database so it can be used.
+This command will install or update the corresponding npm package (equivalent of calling `npm install butterbot-butter@latest`).
+
+Once the npm package has installed successfully, the bot will look for and parse the manifest file. If things look OK, the package will be registered in the local database file so it can be used.
+
+Manifest files are required; installation of your package will fail if there is no `butterbot.json` file in the root of your project.
 
 ## Automatic package maintenance 
 
 Whenever BB is ran, it automatically installs or updates packages that are registered in its database if they appear to be missing, or the wrong version. The BB database effectively acts as a custom lock file. 
 
- 
