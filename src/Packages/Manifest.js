@@ -77,7 +77,7 @@ class Manifest {
         if (data.tasks) {
             for (let i = 0; i < data.tasks.length; i++) {
                 let _taskData = data.tasks[i];
-                manifest.tasks.push(ManifestTask.fromData(_taskData));
+                manifest.tasks.push(ManifestTask.fromData(this, _taskData));
             }
         }
 

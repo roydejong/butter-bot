@@ -6,14 +6,15 @@ const ManifestTask = require('../src/Packages/ManifestTask');
 describe('Manifest struct', () => {
     it('Can parse task list from file on disk', () => {
         let expected = new Manifest();
-        expected.tasks.push(new ManifestTask("sample-file-task", "sample-file-req"));
+        expected.tasks.push(new ManifestTask(expected, "sample-file-task", "sample-file-req"));
 
-        // --
+        let actual = Manifest.parseFromPath(path.join(__dirname, "./samples/sample-manifest.json"));
 
-        let samplePath = path.join(__dirname, "./samples/sample-manifest.json");
-        let actual = Manifest.parseFromPath(samplePath);
+        // normalize so chai doesn't break
+        actual.tasks[0].manifest = null;
+        expected.tasks[0].manifest = null;
 
-        expect(actual).to.deep.equal(expected);
+        expect(actual.tasks).to.deep.equal(expected.tasks);
     });
 
     it('Validity checks: Blank manifest is valid (baseline test)', () => {

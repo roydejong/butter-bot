@@ -1,13 +1,16 @@
 const ButterDb = require('../Core/ButterDb');
 const PackageManager = require('./PackageManager');
-const Logger = require('../Core/ButterLog').logger;
+const logger = require('../Core/ButterLog').logger;
+const PackageLoader = require('../Packages/PackageLoader');
 
 /**
- * Utility class for initializing the Butter Bot package system on startup.
+ * Utility for verifying and automatic maintenance for registered packages.
  */
 class PackageInitializer {
     /**
      * Initializes all packages.
+     *
+     * @return Promise<Object[]> Resolves with a list of loaded packages ("packages" database record values).
      */
     static bootstrapPackages() {
         return new Promise((resolve, reject) => {
@@ -18,7 +21,7 @@ class PackageInitializer {
 
             // If there are no packages, bail out now
             if (!packages || !packages.length) {
-                Logger.info("[bpm] No additional packages have been registered.");
+                logger.info("[bpm] No additional packages have been registered.");
                 resolve();
                 return;
             }
@@ -28,20 +31,28 @@ class PackageInitializer {
             let idx = 0;
             let rem = packages.length;
 
-            let countAvailable = 0;
             let countFailed = 0;
+            let pkgListAv = [];
 
             /**
              * Routine that should be triggered when there are no packages left to install (rem == 0).
+             * Processes the loaded packages, then logs and returns the output.
              */
             let fnDone = () => {
+                // Process manifests & load what we need to load into our repositories (like tasks - kinda important)
+                let loaderStats = PackageLoader.loadFromDatabaseList(pkgListAv);
+
+                // Done
+                let countAvailable = pkgListAv.length;
+                let countTasks = loaderStats.tasks || 0;
+
+                logger.info(`[bpm] ${countTasks} task(s) available from ${countAvailable} package(s).`);
+
                 if (countFailed > 0) {
-                    Logger.warn(`[bpm] ${countAvailable} package(s) available. ${countFailed} failed to load.`);
-                } else {
-                    Logger.info(`[bpm] ${countAvailable} package(s) installed.`);
+                    logger.warn(`[bpm] ${countFailed} package(s) failed to load and are unavailable.`);
                 }
 
-                resolve();
+                resolve(pkgListAv);
             };
 
             /**
@@ -61,23 +72,23 @@ class PackageInitializer {
 
                 if (!PackageManager.isInstalled(pkg.id)) {
                     // Not yet installed
-                    Logger.warn(`[bpm] Registered package \`${pkg.id}\` appears to be missing, restoring...`);
+                    logger.warn(`[bpm] Registered package \`${pkg.id}\` appears to be missing, restoring...`);
 
                     PackageManager.install(pkg.lock_name, false)
                         .then(() => {
                             // Install OK, step next
-                            countAvailable++;
+                            pkgListAv.push(pkg);
                             fnNext();
                         })
                         .catch((err) => {
                             // Install failed, step next
                             countFailed++;
-                            Logger.warn(`[bpm] Could not restore package ${pkg.id}: ${err}`);
+                            logger.warn(`[bpm] Could not restore package ${pkg.id}: ${err}`);
                             fnNext();
                         });
                 } else {
                     // Already installed, step next
-                    countAvailable++;
+                    pkgListAv.push(pkg);
                     fnNext();
                 }
             };

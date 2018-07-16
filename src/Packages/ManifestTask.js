@@ -7,10 +7,18 @@ class ManifestTask {
     /**
      * Construct new manifest task definition.
      *
+     * @param {Manifest} manifest - Parent manifest.
      * @param {string} name - Globally unique task name.
      * @param {string} require - Task require path.
      */
-    constructor(name, require) {
+    constructor(manifest, name, require) {
+        /**
+         * Parent manifest.
+         *
+         * @type {Manifest}
+         */
+        this.manifest = manifest;
+
         /**
          * Globally unique task name.
          *
@@ -56,10 +64,12 @@ class ManifestTask {
      * Does not guarantee a valid object (use isValid()).
      *
      * @see ManifestTask.isValid
+     *
+     * @param {Manifest} manifest - Parent manifest.
      * @param {Object} data
      */
-    static fromData(data) {
-        return new ManifestTask(data.name || "", data.require || "");
+    static fromData(manifest, data) {
+        return new ManifestTask(manifest, data.name || "", data.require || "");
     }
 }
 
