@@ -36,9 +36,9 @@ class PackageInitializer {
              */
             let fnDone = () => {
                 if (countFailed > 0) {
-                    Logger.warn(`[bpm] ${countAvailable} packages available, ${countFailed} failed to load.`);
+                    Logger.warn(`[bpm] ${countAvailable} package(s) available. ${countFailed} failed to load.`);
                 } else {
-                    Logger.info(`[bpm] ${countAvailable} packages available.`);
+                    Logger.info(`[bpm] ${countAvailable} package(s) installed.`);
                 }
 
                 resolve();
