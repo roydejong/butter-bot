@@ -174,6 +174,14 @@ describe('Schedule expression parser', () => {
         expect(output.interval).to.equal(60 * 5);
     });
 
+    it('Interval parser: Can combine single-intervals with (multiple) days using "on" (every X on Y1 and Y2)', () => {
+        let input = "every minute on friday and saturday";
+        let output = Schedule.parsePart(input);
+
+        expect(output.days).to.deep.equal([5, 6]);
+        expect(output.interval).to.equal(60 * 1);
+    });
+
 
     // ---
 

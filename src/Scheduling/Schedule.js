@@ -126,6 +126,7 @@ class Schedule {
                     dIntervalValue = Schedule.calculateInterval(1, _nextPart); // 1 <unit>
 
                     fnExpectNothing();
+                    sExpectingOn = true; // allow "every X Y on Z1 and Z2" type bridges (interval -> day)
                     continue;
                 }
 
