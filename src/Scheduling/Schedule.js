@@ -54,7 +54,7 @@ class Schedule {
             let partExParsed = this.parsePart(partEx);
 
             if (partExParsed != null) {
-                parsedParts.push(partEx);
+                parsedParts.push(partExParsed);
             }
         }
 
