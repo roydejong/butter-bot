@@ -234,16 +234,14 @@ describe('Schedule expression parser', () => {
         expect(() => { Schedule.parsePart(input) }).to.throw();
     });
 
-    it('Throws syntax error: "today" cannot be prefixed', () => {
-        let input = "every today";
-
-        expect(() => { Schedule.parsePart(input) }).to.throw();
+    it('Throws syntax error: "today" cannot be prefixed (if no interval)', () => {
+        expect(() => { Schedule.parsePart("every today") }).to.throw();
+        expect(() => { Schedule.parsePart("every 5 minutes on today") }).to.not.throw();
     });
 
-    it('Throws syntax error: "tomorrow" cannot be prefixed', () => {
-        let input = "next tomorrow";
-
-        expect(() => { Schedule.parsePart(input) }).to.throw();
+    it('Throws syntax error: "tomorrow" cannot be prefixed (if no interval)', () => {
+        expect(() => { Schedule.parsePart("every tomorrow") }).to.throw();
+        expect(() => { Schedule.parsePart("every 5 minutes on tomorrow") }).to.not.throw();
     });
 
     it('Throws syntax error: Cannot have any day token after a time was specified', () => {

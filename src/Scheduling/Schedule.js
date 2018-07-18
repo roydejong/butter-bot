@@ -83,6 +83,7 @@ class Schedule {
         let sDidReadTime = false;       // -- Indicates whether a time string was read, used for syntax validation.
         let sExpectingInterval = false; // -- Indicates whether an interval expression (every X Y) is legal next.
         let sReadingIntervalPart = false; // -- Indicates whether we just read an interval value, and are now expecting a unit name.
+        let sHasValidInterval = false;  // -- Indicates whether a full, valid interval was parsed or not.
 
         let dPrefix = Schedule.T_PREFIX_THIS;
         let dDayNums = [];
@@ -127,6 +128,7 @@ class Schedule {
 
                     fnExpectNothing();
                     sExpectingOn = true; // allow "every X Y on Z1 and Z2" type bridges (interval -> day)
+                    sHasValidInterval = true;
                     continue;
                 }
 
@@ -150,6 +152,7 @@ class Schedule {
 
                     fnExpectNothing();
                     sReadingIntervalPart = false;
+                    sHasValidInterval = true;
                     sExpectingOn = true; // allow "every X Y on Z1 and Z2" type bridges (interval -> day)
                     continue;
                 }
@@ -167,16 +170,16 @@ class Schedule {
 
                 // Special tokens
                 if (_nextPart === Schedule.T_DAY_TODAY) {
-                    if (sDidReadPrefix) {
-                        throw new Error(`Could not parse schedule expression: Cannot combine "${_nextPart}" with a prefix (${dPrefix}).`);
+                    if (sDidReadPrefix && !sHasValidInterval) {
+                        throw new Error(`Could not parse schedule expression: Cannot combine "${_nextPart}" with a repeating day prefix ("${dPrefix}").`);
                     }
 
                     // Today => evaluated at time of parsing
                     let today = new Date().getDay();
                     dDayNums.push(today);
                 } else if (_nextPart === Schedule.T_DAY_TOMORROW) {
-                    if (sDidReadPrefix) {
-                        throw new Error(`Could not parse schedule expression: Cannot combine "${_nextPart}" with a prefix (${dPrefix}).`);
+                    if (sDidReadPrefix && !sHasValidInterval) {
+                        throw new Error(`Could not parse schedule expression: Cannot combine "${_nextPart}" with a repeating day prefix ("${dPrefix}").`);
                     }
 
                     // Tomorrow => evaluated at time of parsing
