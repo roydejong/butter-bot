@@ -36,7 +36,7 @@ class DayTime {
      * @param {DayTime} dt
      */
     equals(dt) {
-        return JSON.stringify(this) === JSON.stringify(dt);
+        return this.diff(dt) === 0;
     }
 
     /**
