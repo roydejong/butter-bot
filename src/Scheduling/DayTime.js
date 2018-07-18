@@ -95,6 +95,14 @@ class DayTime {
     static fromMoment(moment) {
         return new DayTime(moment.hour(), moment.minute(), moment.second());
     }
+
+    /**
+     * Create a DayTime from the current time.
+     */
+    static now() {
+        let now = new Date();
+        return new DayTime(now.getHours(), now.getMinutes(), now.getSeconds());
+    }
 }
 
 module.exports = DayTime;

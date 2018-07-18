@@ -91,4 +91,15 @@ describe('DayTime struct', () => {
         expect(dt3.isBefore(dt2)).to.equal(true);
         expect(dt3.isBefore(dt3)).to.equal(false);
     });
+
+    it('Can create from current time', () => {
+        let now = new Date();
+        let dtNow = DayTime.now();
+
+        expect(dtNow.hour).to.equal(now.getHours());
+        expect(dtNow.minute).to.equal(now.getMinutes());
+        expect(dtNow.second).to.equal(now.getSeconds());
+
+        // TODO uh, will this test break? possibly.
+    });
 });
