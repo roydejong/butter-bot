@@ -20,16 +20,23 @@ describe('ScheduledTask struct', () => {
         let inputProps = {
             "my": "propset123"
         };
+        let inputSched = "every minute on sunday";
+        let inputPrio = 123;
 
         let sTask = new ScheduledTask({
             "taskName": inputTask,
-            "properties": inputProps
+            "properties": inputProps,
+            "scheduleExpression": inputSched,
+            "priority": inputPrio
         });
+
         let actual = sTask.discriminator;
 
         let expected = [
             inputTask,
-            hash.MD5(inputProps)
+            hash.MD5(inputProps),
+            inputSched,
+            inputPrio
         ].join('@');
 
         expect(actual).to.equal(expected);
