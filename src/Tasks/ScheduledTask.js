@@ -46,6 +46,24 @@ class ScheduledTask {
          */
         this.priority = ScheduledTask.DEFAULT_PRIORITY;
 
+        // ----- Non-unique properties (not part of disciminator) live below this line ---------------------------------
+
+        /**
+         * Raw last run date value.
+         * May be set to NULL if this task has not ran before.
+         *
+         * @type {string|null}
+         */
+        this.lastRun = null;
+
+        /**
+         * Raw last run result value.
+         * May be set to NULL if this task has not ran before, or did not return anything explicitly.
+         *
+         * @type {*|null}
+         */
+        this.lastRunResult = null;
+
         if (options) {
             this.fillFromObject(options);
         }
@@ -84,8 +102,10 @@ class ScheduledTask {
                     // Valid property & whitelisted for assignment
                     this[propName] = options[propName];
                 } else {
-                    // Not whitelisted for assignment
-                    logger.warn(`[task] Violation warning: Not allowed to set property "${propName}" on a task.`);
+                    // Not whitelisted for assignment (log if not "id" which we ignore silently)
+                    if (propName !== "id") {
+                        logger.warn(`[task] Violation warning: Not allowed to set property "${propName}" on a task.`);
+                    }
                 }
             }
         }
@@ -97,10 +117,12 @@ class ScheduledTask {
      * @return {Object}
      */
     asDatabaseObject() {
-        let szObj = {};
+        let szObj = { };
 
-        for (let propName in ScheduledTask.ASSIGNABLE_OPTIONS) {
-            if (this.hasOwnProperty(propName) && this[propName]) {
+        for (let i = 0; i < ScheduledTask.ASSIGNABLE_OPTIONS.length; i++) {
+            let propName = ScheduledTask.ASSIGNABLE_OPTIONS[i];
+
+            if (typeof this[propName] !== "undefined" && this[propName]) {
                 szObj[propName] = this[propName];
             }
         }
@@ -130,7 +152,8 @@ class ScheduledTask {
  *
  * @type {string[]}
  */
-ScheduledTask.ASSIGNABLE_OPTIONS = ["taskName", "properties", "scheduleExpression", "priority"];
+ScheduledTask.ASSIGNABLE_OPTIONS = ["taskName", "properties", "scheduleExpression", "priority", "lastRun",
+    "lastRunResult"];
 
 /**
  * Separator token for discriminator string generation.

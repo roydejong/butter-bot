@@ -64,13 +64,14 @@ class ButterBot {
             .then(() => {
                 if (!bootstrapOnly) {
                     this.taskEngine = new TaskEngine();
-                    this.taskEngine.scheduleNext(true);
+                    this.taskEngine.reload();
+                    this.taskEngine.start(true);
 
                     logger.info(`✅ Butter Bot has started successfully.`);
                 }
             })
             .catch((err) => {
-                logger.error(`[init] Failed to initialize package system.`);
+                logger.error(`[init] Failed to initialize package system and task engine.`);
                 console.error(err);
                 process.exit(-1);
             });

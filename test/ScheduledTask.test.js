@@ -54,14 +54,20 @@ describe('ScheduledTask struct', () => {
 
     it('Can be serialized into simple database object', () => {
         let sTask = new ScheduledTask({
-            "packageName": "bb-test-pkg",
-            "taskName": "some-task"
+            "taskName": "some-task",
+            "scheduleExpression": "every day",
+            "priority": 1234,
+            "properties": {"a": "b", "c": 123}
         });
 
         let actual = sTask.asDatabaseObject();
 
         let expected = {
-            id: sTask.discriminator
+            "id": sTask.discriminator,
+            "taskName": "some-task",
+            "scheduleExpression": "every day",
+            "priority": 1234,
+            "properties": {"a": "b", "c": 123}
         };
 
         expect(actual).to.deep.equal(expected);

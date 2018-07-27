@@ -12,11 +12,22 @@ class TaskRepository {
     }
 
     /**
+     * Helper function: Fetch task by its name safely.
+     *
+     * @param taskName
+     * @returns {ManifestTask|null} Task definition, or NULL if not found.
+     */
+    static getTask(taskName) {
+        return this.tasks[taskName] || null;
+    }
+
+    /**
      * Helper function.
      * Adds all the tasks from a given manifest file (via putTask()).
      *
-     * @param {Manifest} manifest - The manifest that holds the task list to process.
      * @see putTask
+     *
+     * @param {Manifest} manifest - The manifest that holds the task list to process.
      * @return {Number} Total amount of tasks processed.
      */
     static putTasksFromManifest(manifest) {
@@ -55,24 +66,7 @@ class TaskRepository {
             "manifestTask": manifestTask
         };
     }
-
-    /**
-     * Pulls a task, removing it from the repository.
-     *
-     * @param {string} taskName - The globally unique identifier for this task.
-     * @return {boolean} True if task was found and removed, false if no action was taken.
-     */
-    static pullTask(taskName) {
-        if (typeof this.tasks[taskName] !== "undefined") {
-            delete this.tasks[taskName];
-            return true;
-        }
-
-        return false;
-    }
 }
-
-// Bootstrap
-TaskRepository.clear();
+TaskRepository.clear(); // Bootstrap on module load
 
 module.exports = TaskRepository;
