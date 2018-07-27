@@ -118,7 +118,7 @@ class TaskEngine {
 
             // Schedule the next one
             this.start(false);
-        }, scheduleResult.intervalSecs);
+        }, scheduleResult.intervalSecs * 1000);
     }
 
     updateLastRun(scheduledTask, runResult) {
