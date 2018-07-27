@@ -9,6 +9,9 @@ const Scheduler = require('../Scheduling/Scheduler');
 class TaskEngine {
     /**
      * Reloads the list of scheduled tasks.
+     *
+     * @param {boolean} doLog - If true, enable logging for loaded tasks.
+     * @param {boolean} doRebuild - If true, rebuild the task database.
      */
     reload(doLog, doRebuild) {
         let dbTasks = db
@@ -131,7 +134,7 @@ class TaskEngine {
 
         if (!dbTask) {
             logger.warn(`[tasks] (${scheduledTask.discriminator}) Could not update task in database: record appears to be missing. The database was likely changed after the bot started and is out-of-sync. Forcing reload now.`);
-            this.reload();
+            this.reload(true, true);
             return;
         }
 
@@ -146,7 +149,7 @@ class TaskEngine {
 
         // TODO Review if reloading is a good idea. The answer is probably NO.
         // For now we do this so lastRun values are updated.
-        this.reload();
+        this.reload(false, false);
     }
 
     /**
