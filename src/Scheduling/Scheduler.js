@@ -40,7 +40,7 @@ class Scheduler {
             let nextExec = this.getNextRun(_schedTask, qualifyingSchedules);
 
             if (nextExec) {
-                let intervalForTask = moment().diff(nextExec, 'seconds');
+                let intervalForTask = nextExec.diff(moment(), 'seconds');
 
                 if (selInterval >= 0 && (selInterval == null || selInterval > intervalForTask)) {
                     // First matching task, or this interval is closer than our previously selected task
