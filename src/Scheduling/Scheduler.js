@@ -42,7 +42,7 @@ class Scheduler {
             if (nextExec) {
                 let intervalForTask = moment().diff(nextExec, 'seconds');
 
-                if (selInterval == null || selInterval > intervalForTask) {
+                if (selInterval >= 0 && (selInterval == null || selInterval > intervalForTask)) {
                     // First matching task, or this interval is closer than our previously selected task
                     selInterval = intervalForTask;
                     selTask = _schedTask;
@@ -64,18 +64,63 @@ class Scheduler {
     }
 
     static getNextRun(scheduledTask, qualifyingSchedules) {
+        let now = moment();
+
         let lastRun = moment(scheduledTask.lastRun);
+        let lastRunDayTime = DayTime.fromMoment(lastRun);
 
         if (!lastRun || !lastRun.isValid()) {
             // This task has not been run yet, but it qualifies, so run it now
-            return moment();
+            return now;
         }
+
+        let wasRunToday = now.format('LL') === lastRun.format('LL');
+
+        let runs = [];
 
         for (let i = 0; i < qualifyingSchedules.length; i++) {
             let _sched = qualifyingSchedules[i];
+
+            if (_sched.interval > 0) {
+                // Task has an interval, compare to last execution and return that as next expected exec.
+                // This handles "every X seconds/minutes/hours/days/weeks/months".
+                runs.push(lastRun.add(_sched.interval, 'seconds'));
+            } else if (_sched.times) {
+                // Task needs to be run at some point today, and it has a set time, or multiple times to run at
+                // We'll work out what the day time is, and use that for our run time
+                let lowestDayTime = null;
+
+                for (let j = 0; j < _sched.times.length; j++) {
+                    let _dayTime = _sched.times[j];
+
+                    if (wasRunToday && lastRunDayTime.isOnOrAfter(_dayTime)) {
+                    //     already ran today, on or after the time we're evaluating
+                        continue;
+                    }
+
+                    if (lowestDayTime == null || lowestDayTime.isAfter(_dayTime)) {
+                        lowestDayTime = _dayTime;
+                    }
+                }
+
+                if (lowestDayTime) {
+                    runs.push(lowestDayTime.applyToMoment(moment()));
+                }
+            }
         }
 
-        return null;
+        // Select closest run of any possible candidates
+        let lowestNextRun = null;
+
+        for (let i = 0; i < runs.length; i++) {
+            let _runMoment = runs[i];
+
+            if (lowestNextRun === null || lowestNextRun.isAfter(_runMoment)) {
+                lowestNextRun = _runMoment;
+            }
+        }
+
+        return lowestNextRun;
     }
 
     /**

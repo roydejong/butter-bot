@@ -2,7 +2,8 @@ const moment = require('moment');
 const DayTime = require('./DayTime');
 
 /**
- *
+ * Parsed schedule item +
+ * utilities for parsing schedule expression.
  */
 class Schedule {
     /**
@@ -220,10 +221,24 @@ class Schedule {
             }
 
             // Token connect: day <-> time connector AT
-            if (sExpectingAt && _nextPart === Schedule.T_AT) {
-                fnExpectNothing();
-                sExpectingTime = true;
-                continue;
+            if (_nextPart === Schedule.T_AT) {
+                if (!sExpectingAt && dPrefix === Schedule.T_PREFIX_EVERY && dIntervalValue === Schedule.calculateInterval(1, 'day')) {
+                    // Special case: Every day at <time(s)>
+                    dIntervalValue = null;
+                    dIntervalNumber = null;
+
+                    dDayNums = [0, 1, 2, 3, 4, 5, 6];
+
+                    fnExpectNothing();
+                    sExpectingAt = true;
+                    sHasValidInterval = false;
+                }
+
+                if (sExpectingAt) {
+                    fnExpectNothing();
+                    sExpectingTime = true;
+                    continue;
+                }
             }
 
             // Token connect: interval <-> day(s) connector ON

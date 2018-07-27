@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const DayTime = require('../src/Scheduling/DayTime');
+const moment = require('moment');
 
 describe('DayTime struct', () => {
     it('Can construct with basic input', () => {
@@ -101,5 +102,15 @@ describe('DayTime struct', () => {
         expect(dtNow.second).to.equal(now.getSeconds());
 
         // TODO uh, will this test break? possibly.
+    });
+
+    it('Can apply to Moment', () => {
+        let dayTime = new DayTime(12, 34, 56);
+        let baseMoment = moment("2018-02-03 22:33:44");
+
+        let expected = moment("2018-02-03 12:34:56").format();
+        let actual = dayTime.applyToMoment(baseMoment).format();
+
+        expect(expected).to.equal(actual);
     });
 });

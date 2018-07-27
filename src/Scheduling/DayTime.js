@@ -67,6 +67,16 @@ class DayTime {
     }
 
     /**
+     * Compare: Is this time ON or AFTER a given DayTime?
+     *
+     * @param {DayTime} dt
+     * @returns {boolean}
+     */
+    isOnOrAfter(dt) {
+        return this.equals(dt) || this.isAfter(dt);
+    }
+
+    /**
      * Compare: Is this time BEFORE a given DayTime?
      *
      * @param {DayTime} dt
@@ -85,6 +95,19 @@ class DayTime {
         let zp = (input) => { input = input.toString(); return input.length === 1 ? `0${input}` : input; };
         let parts = [zp(this.hour), zp(this.minute), zp(this.second)];
         return parts.join(':');
+    }
+
+    /**
+     * Modifies a moment: maintain its date value, but modify the time value.
+     *
+     * @param {moment} moment
+     */
+    applyToMoment(moment) {
+        return moment
+            .startOf('day')
+            .add(this.hour, 'hours')
+            .add(this.minute, 'minutes')
+            .add(this.second, 'seconds');
     }
 
     /**

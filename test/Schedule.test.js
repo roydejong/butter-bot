@@ -88,6 +88,15 @@ describe('Schedule expression parser', () => {
         expect(output.times[1].toString()).to.equal("15:00:00");
     });
 
+    it('Parses "every day" with times (every day on X)', () => {
+        let input = "every day at 3pm";
+        let output = Schedule.parsePart(input);
+
+        expect(output.prefix).to.equal('every');
+        expect(output.days).to.deep.equal([0, 1, 2, 3, 4, 5, 6]);
+        expect(output.times[0].toString()).to.equal("15:00:00");
+    });
+
 
     // ---
 
