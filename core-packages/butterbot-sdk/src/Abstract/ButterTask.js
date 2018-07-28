@@ -17,8 +17,9 @@ class ButterTask {
     }
 
     /**
-     * Execute a job.
+     * Execute the job.
      *
+     * @abstract
      * @throws {*} May throw any error, if task execution fails. The job will be marked as failed.
      * @return {*} Anything - will be passed to any subsequent tasks in the chain, and stored with the scheduled task.
      */

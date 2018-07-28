@@ -1,6 +1,6 @@
 {
   "name": "butterbot-sdk",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Useful things for writing Butter Bot packages (optional)",
   "main": "src/index.js",
   "author": "Roy de Jong <roy@opdroid.com>",
