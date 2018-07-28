@@ -1,0 +1,16 @@
+{
+  "name": "butterbot-sdk",
+  "version": "0.1.0",
+  "description": "Useful things for writing Butter Bot packages (optional)",
+  "main": "index.js",
+  "author": "Roy de Jong <roy@opdroid.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roydejong/butter-bot.git"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  }
+}
