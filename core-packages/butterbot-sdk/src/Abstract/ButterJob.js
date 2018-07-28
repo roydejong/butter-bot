@@ -60,3 +60,5 @@ class ButterJob {
         return typeof this.properties[key] !== "undefined";
     }
 }
+
+module.exports = ButterJob;

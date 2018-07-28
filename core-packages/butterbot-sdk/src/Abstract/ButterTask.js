@@ -26,3 +26,5 @@ class ButterTask {
         throw new Error('ButterTask.run() has not been implemented');
     }
 }
+
+module.exports = ButterTask;
