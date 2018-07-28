@@ -168,7 +168,7 @@ describe('Schedule expression parser', () => {
     });
 
     it('Interval parser: Parses "X months" format', () => {
-        expect(Schedule.parsePart("every 3 months").interval).to.equal(7948800); // 31 days + 30 days + 31 days // TODO this will break
+        expect(Schedule.parsePart("every 3 months").interval).to.be.oneOf([7948800, 7952400]); // TODO
     });
 
 
