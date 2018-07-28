@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/roydejong/butter-bot#readme",
   "dependencies": {
+    "butterbot-sdk": "file:core-packages/butterbot-sdk",
     "lowdb": "^1.0.0",
     "minimist": "^1.2.0",
     "moment": "^2.22.2",
