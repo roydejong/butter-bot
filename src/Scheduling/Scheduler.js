@@ -46,6 +46,7 @@ class Scheduler {
                     // First matching task, or this interval is closer than our previously selected task
                     selInterval = intervalForTask;
                     selTask = _schedTask;
+                    selPriority = _schedTask.priority;
                 } else {
                     logger.debug(`[scheduler-test] No-run: ${_schedTask.discriminator} [other task is closer]`);
                 }
