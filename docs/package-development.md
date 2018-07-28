@@ -26,8 +26,17 @@ A typical manifest file might look like this:
     {  
        "tasks": [  
           {  
-             "name": "serve-butter",
-             "require": "src/tasks/ServeButter.js"
+             "name": "http-get",
+             "require": "src/tasks/HttpGet.js",
+             "properties": [
+                {
+                    "name": "url",
+                    "type": "string",
+                    "label": "Target URL",
+                    "description": "Absolute target URL. Must start with `https://`.",
+                    "required": true
+                }
+             ]
           }
        ]
     }
@@ -42,6 +51,28 @@ The manifest root may contain a `tasks` array that contains any amount of task d
 |----|----|-------|-----|
 |**`name`**|`string`|Globally (world) unique name / identifier for this task. This name will be used internally whenever referring to this task.|Required, unique|
 |**`require`**|`string`|The relative path to the module that should be `require()`'d by Butter Bot. Relative to the path the module is installed in.|Required|
+|**`properties`**|`object[]`|Array that contains property definitions (see below). Provides information about configurable values for this task.|Optional *(but strongly recommended if your task takes properties)*|
+
+#### Property definitions
+
+In the `properties` array, you can optionally provide information about the parameters that your task takes as input.
+
+You're not required to define this, but we do strongly recommend it (if your task takes properties, which most tasks do). This will allow Butter Bot to validate task configurations with useful error messages.
+
+Additionally, configuration UIs like Opdroid would use this information to automatically generate a fancy configuration form for your task.
+
+**NOTE - CURRENT STATE:** We're still in development. Validation and config UIs don't exist yet. But it's good to have a standard to adhere to for future use.
+
+Each object in the `properties` can contain these values:
+
+|Variable|Type|Description|Notes|
+|----|----|-------|-----|
+|**`name`**|`string`|Property key.|Required, unique in task.|
+|**`type`**|`string`|Field type. Affects what type of values are allowed, and how they should be entered in config UI. Possible values: `string`, `number`, `array`, `object`, `*`.|Optional. Defaults to `*` (*any*).|
+|**`label`**|`string`|The friendly filed name to show to the user.|Optional. Defaults to value of `name`.|
+|**`description`**|`string`|Additional / longer text to explain this property to the user.|Optional. Defaults to blank / hidden.|
+|**`required`**|`boolean`|If true, this property is required and the task cannot run without it.|Optional. Defaults to `false`.|
+
 
 ## Publishing
 
