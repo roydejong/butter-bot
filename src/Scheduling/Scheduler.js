@@ -29,8 +29,8 @@ class Scheduler {
                 continue;
             }
 
-            if (selTask != null  && selPriority !== _schedTask.priority) {
-                // We already have a task to run on a higher priority
+            if (selTask != null && selPriority !== _schedTask.priority && selInterval <= 0) {
+                // We already have a task to run on a higher priority, and a lower interval is impossible
                 // (Since tasks are pre-sorted we can break out safely here, as we just stepped up)
                 logger.debug(`[scheduler-test] Break out: Refusing to step up a priority, selection complete`);
                 break;
