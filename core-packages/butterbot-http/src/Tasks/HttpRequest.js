@@ -6,4 +6,4 @@ class HttpRequest extends ButterTask {
     }
 }
 
-module.exports = ButterTask;
+module.exports = HttpRequest;

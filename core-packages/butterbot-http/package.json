@@ -1,6 +1,6 @@
 {
   "name": "butterbot-http",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Core HTTP extensions and tasks for Butter Bot",
   "main": "src/index.js",
   "author": "Roy de Jong <roy@opdroid.com>",
