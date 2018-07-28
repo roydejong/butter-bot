@@ -2,6 +2,7 @@ const logger = require('../Core/ButterLog').logger;
 const db = require('../Core/ButterDb').db;
 const ScheduledTask = require('./ScheduledTask');
 const Scheduler = require('../Scheduling/Scheduler');
+const JobRunner = require('./JobRunner');
 
 /**
  * Main task engine class. Responsible for scheduling
@@ -77,7 +78,7 @@ class TaskEngine {
      *
      * @param {boolean} firstRun - If true, be more verbose about potential config problems.
      */
-    start(firstRun) {
+    loop(firstRun) {
         // Ensure previous timeout is cleared
         this.stop();
 
@@ -96,36 +97,35 @@ class TaskEngine {
 
             // Schedule an infinitely recurring no-op / keep-alive task
             this._timeoutId = setTimeout(() => {
-                this.start(false);
+                this.loop(false);
             }, TaskEngine.IDLE_RECHECK_INTERVAL);
 
             return;
         }
 
-        setTimeout(() => {
+        this._timeoutId = setTimeout(() => {
             // Run the task
             let scheduledTask = scheduleResult.task;
 
-            let runDidSucceed = true;
-            let runResult = null;
+            logger.info(`[tasks] (${scheduledTask.discriminator}) Executing task.`);
 
-            try {
-                logger.debug(`[tasks] (${scheduledTask.discriminator}) Executing task.`);
-                // TODO Like, run the task
-            } catch (e) {
-                logger.error(`[tasks] (${scheduledTask.discriminator}) Task execution failed due to an internal/uncaught exception: ${e}`);
-                runDidSucceed = false;
-            }
+            JobRunner.run(scheduledTask)
+                .then((result) => {
+                    logger.info(`[tasks] (${scheduledTask.discriminator}) -> Job done.`);
 
-            // Update the task's last_run state
-            this.updateLastRun(scheduledTask, runResult);
+                    this.updateLastRun(scheduledTask, true, result);
+                    this.loop(false);
+                })
+                .catch((err) => {
+                    logger.error(`[tasks] (${scheduledTask.discriminator}) -> Job failed. ${err}`);
 
-            // Schedule the next one
-            this.start(false);
+                    this.updateLastRun(scheduledTask, false, undefined);
+                    this.loop(false);
+                });
         }, scheduleResult.intervalSecs * 1000);
     }
 
-    updateLastRun(scheduledTask, runResult) {
+    updateLastRun(scheduledTask, wasOk, runResult) {
         let id = scheduledTask.discriminator;
 
         let dbTask = db

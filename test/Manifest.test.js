@@ -5,10 +5,10 @@ const ManifestTask = require('../src/Packages/ManifestTask');
 
 describe('Manifest struct', () => {
     it('Can parse task list from file on disk', () => {
-        let expected = new Manifest();
+        let expected = new Manifest("sample-pkg");
         expected.tasks.push(new ManifestTask(expected, "sample-file-task", "sample-file-req"));
 
-        let actual = Manifest.parseFromPath(path.join(__dirname, "./samples/sample-manifest.json"));
+        let actual = Manifest.parseFromPath("sample-pkg", path.join(__dirname, "./samples/sample-manifest.json"));
 
         // normalize so chai doesn't break
         actual.tasks[0].manifest = null;
@@ -18,12 +18,12 @@ describe('Manifest struct', () => {
     });
 
     it('Validity checks: Blank manifest is valid (baseline test)', () => {
-        let mf = new Manifest();
+        let mf = new Manifest("sample-pkg");
         expect(mf.isValid()).to.equal(true);
     });
 
     it('Validity checks: If invalid tasks are held, manifest is invalid', () => {
-        let mf = new Manifest();
+        let mf = new Manifest("sample-pkg");
         mf.tasks.push(new ManifestTask(null, null));
         expect(mf.isValid()).to.equal(false);
     });

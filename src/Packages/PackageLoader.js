@@ -21,7 +21,7 @@ class PackageLoader {
 
             try {
                 let manifestPath = path.join(_dbPkg.path, Manifest.MANIFEST_REL_PATH);
-                let manifest = Manifest.parseFromPath(manifestPath);
+                let manifest = Manifest.parseFromPath(_dbPkg.id, manifestPath);
 
                 if (!manifest.isValid()) {
                     throw new Error(`The "butterbot.json" manifest file for package ${_dbPkg.id} contains invalid settings.`);

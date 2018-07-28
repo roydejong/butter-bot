@@ -65,7 +65,7 @@ class ButterBot {
                 if (!bootstrapOnly) {
                     this.taskEngine = new TaskEngine();
                     this.taskEngine.reload(true, true);
-                    this.taskEngine.start(true);
+                    this.taskEngine.loop(true);
 
                     logger.info(`✅ Butter Bot has started successfully.`);
                 }
