@@ -57,7 +57,7 @@ class TaskEngine {
             return 0;
         });
 
-        if (taskCount > 0) {
+        if (doLog && taskCount > 0) {
             logger.info(`[tasks] There are ${taskCount} scheduled task(s).`);
         }
     }
@@ -111,6 +111,7 @@ class TaskEngine {
 
             try {
                 logger.debug(`[tasks] (${scheduledTask.discriminator}) Executing task.`);
+                // TODO Like, run the task
             } catch (e) {
                 logger.error(`[tasks] (${scheduledTask.discriminator}) Task execution failed due to an internal/uncaught exception: ${e}`);
                 runDidSucceed = false;
