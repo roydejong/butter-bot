@@ -105,12 +105,19 @@ class PackageManager {
         // TODO Figure out how to do this more reliably
 
         if (pkgSpec) {
+            pkgSpec = pkgSpec.trim();
+
             // Strip "@latest" and similar tags
             // <name>@<version>, <name>@<tag>, etc
             let atIdx = pkgSpec.indexOf('@');
 
             if (atIdx >= 0) {
                 pkgSpec = pkgSpec.substr(0, atIdx);
+            }
+
+            // Remove any trailing slashes
+            if (pkgSpec.substr(-1) === '/') {
+                pkgSpec = pkgSpec.substr(0, pkgSpec.length - 1);
             }
 
             // Strip slashes and URLs, only keep last part
