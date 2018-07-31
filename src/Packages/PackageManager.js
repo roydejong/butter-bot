@@ -84,7 +84,7 @@ class PackageManager {
                             packageFailReason = "npm installation failed, or package name did not match";
                         } else if (!installedPath) {
                             packageFailReason = "could not determine installation path for package";
-                        } else if (!this.isInstalled(installedSpec)) {
+                        } else if (!this.isInstalledInPath(installedPath)) {
                             packageFailReason = "package installed, but does not appear to have a valid manifest file";
                         }
 
