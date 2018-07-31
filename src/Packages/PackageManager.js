@@ -102,11 +102,23 @@ class PackageManager {
      * @returns {string}
      */
     static getPackageName(pkgSpec) {
+        // TODO Figure out how to do this more reliably
+
         if (pkgSpec) {
+            // Strip "@latest" and similar tags
+            // <name>@<version>, <name>@<tag>, etc
             let atIdx = pkgSpec.indexOf('@');
 
             if (atIdx >= 0) {
-                return pkgSpec.substr(0, atIdx);
+                pkgSpec = pkgSpec.substr(0, atIdx);
+            }
+
+            // Strip slashes and URLs, only keep last part
+            // Folders, <git-host>:<git-user>/<repo-name> etc
+            let slashIdx = pkgSpec.lastIndexOf('/');
+
+            if (slashIdx >= 0) {
+                pkgSpec = pkgSpec.substr(slashIdx + 1);
             }
         }
 
