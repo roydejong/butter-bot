@@ -67,7 +67,7 @@ class ButterBot {
                     this.taskEngine.reload(true, true);
                     this.taskEngine.loop(true);
 
-                    logger.info(`✅ Butter Bot has started successfully.`);
+                    logger.info(`✅  Butter Bot has started successfully.`);
                 }
             })
             .catch((err) => {

@@ -113,11 +113,20 @@ class TaskEngine {
                 .then((result) => {
                     logger.info(`[tasks] (${scheduledTask.discriminator}) -> Job done.`);
 
+                    try {
+                        let resultJson = JSON.stringify(result);
+                        logger.debug(`[tasks] (${scheduledTask.discriminator}) -> Run result: ${resultJson}`);
+                    } catch (e) {
+                        // "circular json structure" stuff, probably. not something we can serialize
+                        logger.debug(`[tasks] (${scheduledTask.discriminator}) -> Run result unavailable (${e.message}, ${result})`);
+                        result = null;
+                    }
+
                     this.updateLastRun(scheduledTask, true, result);
                     this.loop(false);
                 })
                 .catch((err) => {
-                    logger.error(`[tasks] (${scheduledTask.discriminator}) -> Job failed. ${err}`);
+                    logger.error(`[tasks] (${scheduledTask.discriminator}) -> Job run error: ${err.toString()}`);
 
                     this.updateLastRun(scheduledTask, false, undefined);
                     this.loop(false);
