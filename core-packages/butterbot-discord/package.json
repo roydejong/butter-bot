@@ -1,0 +1,20 @@
+{
+  "name": "butterbot-discord",
+  "version": "0.1.0",
+  "description": "Discord extensions and tasks for Butter Bot",
+  "main": "index.js",
+  "author": "Roy de Jong <roy@opdroid.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roydejong/butter-bot.git"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "butterbot-sdk": "^0.1.3"
+  }
+}

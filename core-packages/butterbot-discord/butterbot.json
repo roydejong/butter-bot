@@ -1,0 +1,47 @@
+{
+  "tasks": [
+    {
+      "name": "discord-webhook",
+      "require": "src/Tasks/DiscordWebhook",
+      "properties": [
+        {
+          "name": "url",
+          "type": "string",
+          "label": "Webhook URL",
+          "required": true
+        },
+        {
+          "name": "wait",
+          "type": "boolean",
+          "label": "Wait for confirmation",
+          "description": "If true, request will hang until the message is confirmed posted by Discord."
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "label": "Message",
+          "description": "the message contents (up to 2000 characters)",
+          "required": true
+        },
+        {
+          "name": "username",
+          "type": "string",
+          "label": "Username",
+          "description": "override the default username of the webhook"
+        },
+        {
+          "name": "avatar_url",
+          "type": "string",
+          "label": "Avatar URL",
+          "description": "override the default avatar of the webhook"
+        },
+        {
+          "name": "tts",
+          "type": "boolean",
+          "label": "Use TTS",
+          "description": "true if this is a TTS message"
+        }
+      ]
+    }
+  ]
+}
