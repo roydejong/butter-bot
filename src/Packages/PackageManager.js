@@ -78,9 +78,19 @@ class PackageManager {
 
                         // Verify the package was installed OK. This is a sanity check for the most part, but also
                         // prevents us from registering a package with no butterbot manifest.
-                        if (!installedSpec || !installedPath || !this.isInstalled(installedSpec)) {
-                            logger.error(`[bpm] (install:${pkgName}) Package was installed locally, but it is not a valid butterbot package.`);
-                            reject("Package installation failed: Not a valid butterbot package (is the manifest missing?)");
+                        let packageFailReason = null;
+
+                        if (!installedSpec) {
+                            packageFailReason = "npm installation failed, or package name did not match";
+                        } else if (!installedPath) {
+                            packageFailReason = "could not determine installation path for package";
+                        } else if (!this.isInstalled(installedSpec)) {
+                            packageFailReason = "package installed, but does not appear to have a valid manifest file";
+                        }
+
+                        if (packageFailReason) {
+                            logger.error(`[bpm] (install:${pkgName}) Post-install check failed: ${packageFailReason}`);
+                            reject(`Package installation failed: (${packageFailReason})`);
                             return;
                         }
 
@@ -193,7 +203,7 @@ class PackageManager {
             .assign(registerValues)
             .write();
 
-        logger.info(`[bpm] (install:${pkgName}) ✅ OK. Package ${pkgSpec} was installed and registered.`);
+        logger.info(`[bpm] (install:${pkgName}) ✅  OK: ${pkgSpec}`);
     }
 
     /**
@@ -203,22 +213,24 @@ class PackageManager {
      * @returns {boolean} Returns true if package appears to resolve OK, or is available for require().
      */
     static isInstalled(pkgIdent) {
-        let pkgName = this.getPackageName(pkgIdent);
         let localReg = this.getRegistration(pkgIdent);
 
         if (localReg) {
-            let manifestPathExpected = localReg.path + ButterbotManifest.MANIFEST_REL_PATH;
-
-            logger.debug(`[bpm] (isInstalled:${pkgName}) Checking for manifest file at ${manifestPathExpected}`);
-
-            if (fs.existsSync(manifestPathExpected)) {
-                // Something exists at the expected location and it has a butterbot manifest
-                // We're probably good!
-                return true;
-            }
+            return this.isInstalledInPath(localReg.path);
         }
 
         return false;
+    }
+
+    /**
+     * Determines whether a valid package appears to be installed in a given directory.
+     *
+     * @param {string} pkgPath - Path to package's installation directory.
+     * @returns {boolean} Returns true if package seems to exist with valid manifest.
+     */
+    static isInstalledInPath(pkgPath) {
+        let pathBbManifest = pkgPath + ButterbotManifest.MANIFEST_REL_PATH;
+        return fs.existsSync(pathBbManifest);
     }
 }
 
