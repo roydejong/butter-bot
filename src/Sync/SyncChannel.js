@@ -78,27 +78,7 @@ class SyncChannel {
     }
 
     get isConnected() {
-        if (!this.socket) {
-            return false;
-        }
-
-        if (!this.socket.isConnected()) {
-            return false;
-        }
-
-        let anyJoinedChannels = false;
-
-        for (let i = 0; i < this.socket.channels; i++) {
-            let _channel = this.socket.channels[i];
-
-            console.log(_channel.state);
-            if (_channel.state === "joined") {
-                anyJoinedChannels = true;
-                break;
-            }
-        }
-
-        return anyJoinedChannels;
+        return this.socket && this.socket.isConnected;
     }
 }
 
