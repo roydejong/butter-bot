@@ -55,8 +55,6 @@ class SyncManager {
         }
 
         // Each channel should begin connecting now
-        logger.info(`[sync] Configured with ${this.remotes.length} remote(s).`);
-
         for (let i = 0; i  <this.remotes.length; i++) {
             let _remote = this.remotes[i];
             _remote.getChannel().connect()

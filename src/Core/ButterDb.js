@@ -36,6 +36,7 @@ class ButterDb {
      */
     static _setDefaults() {
         let defaults = {
+            remotes: [],
             tasks: [],
             packages: [],
             diagnostic: {

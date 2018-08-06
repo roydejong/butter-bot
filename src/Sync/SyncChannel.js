@@ -20,7 +20,7 @@ class SyncChannel {
 
             try {
                 // Server connect
-                logger.info(`[sync] (${this.websocketUrl}) Connecting to remote...`);
+                logger.debug(`[sync] (${this.websocketUrl}) Connecting to remote...`);
 
                 this.socket = new Socket(this.websocketUrl, {
                     params: { }
@@ -47,7 +47,7 @@ class SyncChannel {
                 this.channel.join()
                     .receive("ok", (resp) => {
                         logger.debug(`[sync] (${this.websocketUrl}) OK -> Response: ${JSON.stringify(resp)}`);
-                        logger.info(`[sync] (${this.websocketUrl}) Connected. Joined channel ${chanName}`);
+                        logger.info(`[sync] (${this.websocketUrl}) Connected to remote server (joined "${chanName}" channel).`);
                         resolve();
                     })
                     .receive("error", (resp) => {
@@ -91,6 +91,7 @@ class SyncChannel {
         for (let i = 0; i < this.socket.channels; i++) {
             let _channel = this.socket.channels[i];
 
+            console.log(_channel.state);
             if (_channel.state === "joined") {
                 anyJoinedChannels = true;
                 break;
