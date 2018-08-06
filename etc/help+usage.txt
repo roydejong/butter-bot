@@ -1,18 +1,21 @@
 Usage: butterbot [options]
 
-    -h, --help              Show this usage information.
-    -v, --version           Show version information.
+    -h, --help                  Show this usage information.
+    -v, --version               Show version information.
 
-    -i, --install <pkg>     Install, register or update a BB package / submodule.
-    -u, --uninstall <pkg>   Remove a BB package / submodule and unregister it.
-    -l, --list              Lists all registered BB packages.
+    -i, --install <pkg>         Install, register or update a BB package / submodule.
+    -u, --uninstall <pkg>       Remove a BB package / submodule and unregister it.
+    -l, --list                  Lists all registered BB packages.
 
-    -d, --db <path>         Define a custom database file to use, relative to working directory.
-                            Defaults to `data/butterdb.json` if unspecified.
+    -r, --add-remote <dsn>      Adds a remote task server by its connection string (DSN).
+    --drop-remote <dsn>         Removes (drops) a remote task server by its connection string (DSN).
 
-    -q, --quiet             Suppress informational output and logging; reduce to warnings and errors.
-    --no-stdout             Turn off all stdout (console) output. Does not affect regular logging.
-    --debug                 Enable full, verbose debug logging. Takes precedence over quiet mode.
+    -d, --db <path>             Define a custom database file to use, relative to working directory.
+                                Defaults to `data/butterdb.json` if unspecified.
+
+    -q, --quiet                 Suppress informational output and logging; reduce to warnings and errors.
+    --no-stdout                 Turn off all stdout (console) output. Does not affect regular logging.
+    --debug                     Enable full, verbose debug logging. Takes precedence over quiet mode.
 
 Source code, documentation and official issue tracker available via GitHub:
 

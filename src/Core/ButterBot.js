@@ -51,7 +51,7 @@ class ButterBot {
 
         logger.info(`[init] Using database file ${ButterDb.getFilename()}.`);
 
-        // Process command line arguments - level two (package maintenance etc)
+        // Process command line arguments - level two (post db init - for package maintenance etc)
         if (!this._processArgv(argv, true)) {
             return false;
         }
@@ -107,6 +107,38 @@ class ButterBot {
                         });
                 } else {
                     logger.error(`Usage: butterbot (--install|-i) <packageName>`);
+                }
+
+                return false;
+            }
+
+            // --- Remotes management ----------------------------------------------------------------------------------
+            const SyncManager = require('../Sync/SyncManager');
+
+            let addingRemote = argv["add-remote"] || argv.r || null;
+            let droppingRemote = argv["drop-remote"] || argv.dr || null;
+
+            if (addingRemote) {
+                if (typeof addingRemote === "string" && addingRemote.length) {
+                    if (!SyncManager.add(addingRemote)) {
+                        // Add failed, exit with a non-zero exit code.
+                        process.exit(-1);
+                    }
+                } else {
+                    logger.error(`Usage: butterbot (--add-remote|-r) <dsnConnectionString>`);
+                }
+
+                return false;
+            }
+
+            if (droppingRemote) {
+                if (typeof droppingRemote === "string" && droppingRemote.length) {
+                    if (!SyncManager.remove(droppingRemote)) {
+                        // Drop failed, exit with a non-zero exit code.
+                        process.exit(-1);
+                    }
+                } else {
+                    logger.error(`Usage: butterbot (--drop-remote) <dsnConnectionString>`);
                 }
 
                 return false;

@@ -4,21 +4,100 @@ const SyncRemote = require('./SyncRemote');
 
 class SyncManager {
     /**
+     * Add remote by DSN.
+     *
+     * @param {string} dsnToAdd - Connection string
+     * @return {boolean}
+     */
+    static add(dsnToAdd) {
+        try {
+            SyncRemote.fromDsn(dsnToAdd);
+        } catch (e) {
+            logger.error(`[sync] Skipping adding invalid DSN "${dsnToAdd}": ${e.message}`);
+            return false;
+        }
+
+        let dsnList = db
+            .get('remotes')
+            .value() || [];
+
+        let nextDsnList = [];
+
+        for (let i = 0; i < dsnList.length; i++) {
+            let _dsn = dsnList[i];
+
+            if (_dsn === dsnToAdd) {
+                logger.error(`[sync] Skipped adding duplicate remote; specified DSN already registered: "${dsnToAdd}"`);
+                return false;
+            }
+
+            nextDsnList.push(_dsn);
+        }
+
+        nextDsnList.push(dsnToAdd);
+
+        db.set('remotes', nextDsnList).write();
+        logger.info(`[sync] OK - Added remote: ${dsnToAdd}`);
+        return true;
+    }
+
+    /**
+     * Remove remote by DSN.
+     *
+     * @param {string} dsnToDrop - Connection string
+     * @return {boolean}
+     */
+    static remove(dsnToDrop) {
+        let dsnList = db
+            .get('remotes')
+            .value() || [];
+
+        let nextDsnList = [];
+        let didDrop = false;
+
+        for (let i = 0; i < dsnList.length; i++) {
+            let _dsn = dsnList[i];
+
+            if (_dsn === dsnToDrop) {
+                didDrop = true;
+                continue;
+            }
+
+            nextDsnList.push(_dsn);
+        }
+
+        if (didDrop) {
+            db.set('remotes', nextDsnList).write();
+            logger.info(`[sync] OK - Removed remote: ${dsnToDrop}`);
+            return true;
+        } else {
+            logger.error(`[sync] Removal failed; specified remote not registered: ${dsnToDrop}`);
+            return false;
+        }
+    }
+
+    /**
      * Shuts down sync manager and kills any open channels.
      */
     static shutdown() {
-        if (!this.remotes) {
-            return;
+        // Stop check interval
+        if (this.checkInterval) {
+            clearInterval(this.checkInterval);
+            this.checkInterval = null;
         }
 
-        for (let i = 0; i < this.remotes.length; i++) {
-            let _remote = this.remotes[i];
+        // Disconnect remote channels
+        if (this.remotes) {
+            for (let i = 0; i < this.remotes.length; i++) {
+                let _remote = this.remotes[i];
 
-            try {
-                _remote.killChannel();
-            } catch (e) { }
+                try {
+                    _remote.killChannel();
+                } catch (e) { }
+            }
         }
 
+        // Clear list and await reload via start()
         this.remotes = [];
     }
 
@@ -63,11 +142,6 @@ class SyncManager {
         }
 
         // Start interval for auto-reconnect on failure
-        if (this.checkInterval) {
-            clearInterval(this.checkInterval);
-            this.checkInterval = null;
-        }
-
         this.checkInterval = setInterval(() => {
             for (let i = 0; i < this.remotes.length; i++) {
                 let _remote = this.remotes[i];

@@ -120,7 +120,7 @@ class SyncRemote {
 
         // Validate protocol
         if (protocol === "http") {
-            logger.warn(`[remote] Security warning: DSN uses plain HTTP - ${dsn}`);
+            logger.warn(`[remote] Security warning: DSN uses plain HTTP: ${dsn}. Upgrade to HTTPS asap.`);
         } else if (protocol === "https") {
             // Ok
         } else {
