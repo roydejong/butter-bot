@@ -56,6 +56,10 @@ class ButterBot {
             return false;
         }
 
+        // Start sync with any configured remote servers
+        const SyncManager = require('../Sync/SyncManager');
+        SyncManager.start();
+
         // Initialize package system
         const PkgInit = require('../Packages/PackageInitializer');
         const TaskEngine = require('../Tasks/TaskEngine');

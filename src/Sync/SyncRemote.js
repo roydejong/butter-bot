@@ -1,4 +1,5 @@
 const logger = require('../Core/ButterLog').logger;
+const SyncChannel = require('./SyncChannel');
 
 /**
  * Remote server record.
@@ -12,6 +13,31 @@ class SyncRemote {
     constructor(url, apiKey) {
         this.url = url;
         this.apiKey = apiKey || null;
+        this.channel = null;
+    }
+
+    /**
+     * Gets Channel singleton for this Remote.
+     *
+     * @returns {SyncChannel}
+     */
+    getChannel() {
+        if (!this.channel) {
+            this.channel = new SyncChannel(this.websocketUrl);
+        }
+
+        return this.channel;
+    }
+
+    /**
+     * Ensures any open channel is closed.
+     */
+    killChannel() {
+        if (this.channel) {
+            this.channel.disconnect();
+        }
+
+        this.channel = null;
     }
 
     /**
